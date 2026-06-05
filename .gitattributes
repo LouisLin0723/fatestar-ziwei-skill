@@ -1,0 +1,9 @@
+# Force LF line endings for all text files.
+# Shell scripts (.sh) MUST be LF or they break on Linux/macOS.
+# PowerShell reads LF fine; the .ps1 UTF-8 BOM is preserved regardless of EOL.
+* text=auto eol=lf
+
+# Binary (future-proof)
+*.png binary
+*.jpg binary
+*.ico binary
