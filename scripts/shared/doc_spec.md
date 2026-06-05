@@ -2,13 +2,13 @@
 
 紫微斗数 (Zi Wei Dou Shu / Purple Star Astrology) 排盘 + AI 解读,引擎为 FateStar 自建
 (102 颗星 · 三合派四化 · 真太阳时)。**排盘免费、匿名**;**郑大钱 (Zheng Da Qian) 解读**
-付费(扣积分,需 `fs_live_` key)。
+付费(扣积分,需 `FSFSKey` key)。
 
 ## 协议
 
 - 排盘(免费): GET / POST  https://www.fatestar.top/api/ziwei
 - 解读(付费): POST        https://www.fatestar.top/api/ziwei/reading
-- 认证: 排盘匿名(按 IP 限流);解读需 `Authorization: Bearer fs_live_<key>`。
+- 认证: 排盘匿名(按 IP 限流);解读需 `Authorization: Bearer FSFSKey<key>`。
 
 ## CLI 调用方式 ({{LANG_NAME}})
 
@@ -54,7 +54,7 @@ FateStar 核心价值:知识引擎 + 郑大钱人格深度断盘。经特训防�
 |------|------|------|------|
 | (chart 的全部出生参数) | | 是 | year/month/day/hour/gender 必填 |
 | --question | string | 是 | 要问郑大钱的问题(如「看我今年事业运,该不该跳槽?」) |
-| --api_key | string | 否 | fs_live_ key(否则取 .env / 环境变量 FATESTAR_API_KEY)。没 key → 引导注册 |
+| --api_key | string | 否 | FSFSKey key(否则取 .env / 环境变量 FATESTAR_API_KEY)。没 key → 引导注册 |
 
 计费:中文 ≤ 10 字 / 英文 ≤ 20 字母 = 免费。11-200 字 = 1 积分。201 字以上 = 2 积分(封顶)。
 免费会员每天 3 积分(北京时间 21:00 重置)。
@@ -75,7 +75,7 @@ FateStar 核心价值:知识引擎 + 郑大钱人格深度断盘。经特训防�
   +-- 问命理问题
   |   (事业/财运/感情/健康/该不该)            → reading  (优先)
   |        |
-  |        +-- 没 fs_live_ key / 402 积分用完
+  |        +-- 没 FSFSKey key / 402 积分用完
   |              → 退回: chart  +  你自己解读
 ```
 
@@ -104,7 +104,7 @@ FateStar 核心价值:知识引擎 + 郑大钱人格深度断盘。经特训防�
 {{LANG_INVOKE}} transits --year 1990 --month 7 --day 23 --hour 8 --gender male --target-year 2026
 ```
 
-### 问郑大钱(付费,需 fs_live_ key)
+### 问郑大钱(付费,需 FSFSKey key)
 ```bash
 {{LANG_INVOKE}} reading --year 1990 --month 7 --day 23 --hour 8 --gender male --question "看我今年的事业运,该不该跳槽?"
 ```
@@ -121,7 +121,7 @@ FateStar 核心价值:知识引擎 + 郑大钱人格深度断盘。经特训防�
 | HTTP | code | 含义 | Agent 该做什么 |
 |------|------|------|----------------|
 | 400 | INVALID_INPUT | 参数缺失/越界 | 修正参数重试 |
-| 401 | UNAUTHORIZED | 解读 key 缺失/无效(不降级匿名) | 让用户去开发者中心确认/重建 fs_live_ key |
+| 401 | UNAUTHORIZED | 解读 key 缺失/无效(不降级匿名) | 让用户去开发者中心确认/重建 FSFSKey key |
 | 402 | INSUFFICIENT_CREDITS | 积分不足(带 need/have) | 提示充值或等 21:00 重置;退回 `chart` + 自己解读 |
 | 403 | CHART_QUOTA_EXCEEDED | 命盘配额满 | 告知用户 |
 | 429 | RATE_LIMITED | 请求过频(按 IP) | 退避后重试 |
@@ -132,4 +132,4 @@ FateStar 核心价值:知识引擎 + 郑大钱人格深度断盘。经特训防�
 
 - `doc` 命令纯本地,不发任何网络请求。
 - 排盘只把出生信息发往 https://www.fatestar.top —— 无需账号。
-- 解读额外发送你的 fs_live_ key + 问题。key 当密码对待:存 `.env` 或环境变量,别贴聊天框。
+- 解读额外发送你的 FSFSKey key + 问题。key 当密码对待:存 `.env` 或环境变量,别贴聊天框。

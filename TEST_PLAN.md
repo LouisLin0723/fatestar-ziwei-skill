@@ -14,7 +14,7 @@
 ## 前置条件
 
 1. 已探测可用 runtime,或 `runtime.conf` 就位(优先级 Python > Node.js > Shell)
-2. 测 `reading` 真解读需 `.env` 里有有效 `fs_live_` key(没有则只测降级路径)
+2. 测 `reading` 真解读需 `.env` 里有有效 `FSFSKey` key(没有则只测降级路径)
 3. `generate.py --check` 应 exit 0(4 个 CLI 的公共块一致)
 
 ---
@@ -42,7 +42,7 @@
 | 7 | `reading … --question "今年事业运?"`,**没配 key** | stderr 输出注册引导,exit code = 2 |
 | 8 | reading 缺 `--question` | stderr「--question is required」,exit 1 |
 | 9 | reading 有有效 key + 有积分(需真 key) | stdout 输出郑大钱解读全文;stderr 报扣除/剩余积分 |
-| 10 | reading key 无效(乱填 fs_live_xxx) | 401 提示去开发者中心,exit 1 |
+| 10 | reading key 无效(乱填 FSFSKeyxxx) | 401 提示去开发者中心,exit 1 |
 
 ## 第四组:doc + 错误处理
 

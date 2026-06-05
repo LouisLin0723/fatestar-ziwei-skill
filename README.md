@@ -2,7 +2,7 @@
 
 > 紫微斗数 (Zi Wei Dou Shu / Purple Star Astrology) 排盘 Skill for AI agents — 把 **FateStar 排盘引擎 + 郑大钱 AI 命理师**封装成跨平台 Agent Skill。装上后对 AI 说「帮我排 1990 年 7 月 23 日早上 8 点出生男性的紫微盘」,即自动出盘 + 专业断盘。
 
-**排盘免费、匿名可用**(不要 key);**郑大钱深度解读**付费(知识引擎 + 古籍锚定,需 `fs_live_` key)。引擎自建 102 颗星 + 三合派四化 + 真太阳时,**仓库不含引擎源码** —— 4 套 CLI 都是 `https://www.fatestar.top` 的瘦客户端。
+**排盘免费、匿名可用**(不要 key);**郑大钱深度解读**付费(知识引擎 + 古籍锚定,需 `FSFSKey` key)。引擎自建 102 颗星 + 三合派四化 + 真太阳时,**仓库不含引擎源码** —— 4 套 CLI 都是 `https://www.fatestar.top` 的瘦客户端。
 
 [English summary ↓](#english)
 
@@ -34,7 +34,7 @@ git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
 
 1. 下载 zip 或 `git clone`
 2. 解压,整个目录改名 `ziwei-paipan` 放进 Agent 的 skills 目录
-3.(可选)配一个 `fs_live_` key 解锁郑大钱解读(见下)
+3.(可选)配一个 `FSFSKey` key 解锁郑大钱解读(见下)
 4. 跑装后验证,再问「帮我排…的紫微盘」
 
 ### 零安装替代:远程 MCP
@@ -49,7 +49,7 @@ git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
 
 ## API Key 配置(一个 key 搞定)
 
-**你只需要一个 `fs_live_` key。** 排盘(`chart` / `transits`)免费、匿名可用;只有「郑大钱」专业解读(`reading`)才需 key、才扣积分。
+**你只需要一个 `FSFSKey` key。** 排盘(`chart` / `transits`)免费、匿名可用;只有「郑大钱」专业解读(`reading`)才需 key、才扣积分。
 
 ### 默认行为(重要)
 
@@ -64,20 +64,20 @@ git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
 
 ```bash
 cp .env.example .env
-# 编辑 .env, 填: FATESTAR_API_KEY=fs_live_xxxxxxxx
+# 编辑 .env, 填: FATESTAR_API_KEY=FSFSKey20260606XXXXXXXXXXXXXXXXXXXX
 ```
 
 或直接设环境变量:
 
 ```bash
-export FATESTAR_API_KEY="fs_live_xxxxxxxx"    # Linux / macOS
-set FATESTAR_API_KEY=fs_live_xxxxxxxx         # Windows CMD
-$env:FATESTAR_API_KEY="fs_live_xxxxxxxx"      # Windows PowerShell
+export FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"    # Linux / macOS
+set FATESTAR_API_KEY=FSFSKey20260606XXXXXXXXXXXXXXXXXXXX         # Windows CMD
+$env:FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"      # Windows PowerShell
 ```
 
 ### 拿一个 key
 
-访问 **https://www.fatestar.top** → 注册免费会员 → 做新手任务领积分 → 开发者中心创建固定的 `fs_live_` key(可重复使用)。
+访问 **https://www.fatestar.top** → 注册免费会员 → 做新手任务领积分 → 开发者中心创建固定的 `FSFSKey` key(可重复使用)。
 
 ### 能力优先级
 
@@ -135,7 +135,7 @@ python scripts/ziwei_cli.py chart --year 1990 --month 7 --day 23 --hour 8 --gend
 # 免费排 2026 流年(6 层运限)
 python scripts/ziwei_cli.py transits --year 1990 --month 7 --day 23 --hour 8 --gender male --target-year 2026
 
-# 郑大钱解读(付费, 需 fs_live_ key)
+# 郑大钱解读(付费, 需 FSFSKey key)
 python scripts/ziwei_cli.py reading --year 1990 --month 7 --day 23 --hour 8 --gender male --question "看我今年事业运,该不该跳槽?"
 ```
 
@@ -200,7 +200,7 @@ ziwei-paipan/                 (本仓库, 改名后放进 skills 目录)
 **Zi Wei Dou Shu (Purple Star Astrology) skill for AI agents.** Wraps FateStar's
 self-built charting engine + the 郑大钱 (Zheng Da Qian) AI master into a cross-platform
 Agent Skill. Charting (`chart` / `transits`) is **free and anonymous**; the 郑大钱 reading
-(`reading`) is paid (needs an `fs_live_` key). No engine source here — the four CLIs
+(`reading`) is paid (needs an `FSFSKey` key). No engine source here — the four CLIs
 (Python / Node.js / PowerShell / Bash) are thin clients over `https://www.fatestar.top`.
 
 Install: download the zip, move it into your agent's skills dir as `ziwei-paipan`, then

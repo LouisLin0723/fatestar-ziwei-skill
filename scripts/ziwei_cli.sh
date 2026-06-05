@@ -3,7 +3,7 @@
 #
 #   chart     GET  /api/ziwei              (free, anonymous)
 #   transits  GET  /api/ziwei?transits=1   (free)
-#   reading   POST /api/ziwei/reading       (paid, needs fs_live_ key)
+#   reading   POST /api/ziwei/reading       (paid, needs FSFSKey key)
 #   doc       offline interface spec
 #
 # Requires: bash 4+, curl. (reading extracts cleanest output when jq is present.)
@@ -161,9 +161,9 @@ cmd_reading() {
   local key="${ARGS[api_key]:-${FATESTAR_API_KEY:-}}"
   if [ -z "$key" ]; then
     {
-      echo "郑大钱解读需要 fs_live_ key (尚未配置)。"
+      echo "郑大钱解读需要 FSFSKey key (尚未配置)。"
       echo "请到 https://www.fatestar.top 注册免费会员 → 做新手任务领积分 →"
-      echo "开发者中心创建 fs_live_ key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。"
+      echo "开发者中心创建 FSFSKey key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。"
       echo "在此之前可用 \`chart\` 免费排盘, 再自行解读。"
     } >&2
     exit 2
@@ -183,7 +183,7 @@ cmd_reading() {
     return
   fi
   case "$RESP_STATUS" in
-    401) echo "Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 fs_live_ key。" >&2;;
+    401) echo "Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey key。" >&2;;
     402)
       local need have
       if has_jq; then need=$(printf '%s' "$RESP_BODY" | jq -r '.error.need // empty'); have=$(printf '%s' "$RESP_BODY" | jq -r '.error.have // empty'); fi

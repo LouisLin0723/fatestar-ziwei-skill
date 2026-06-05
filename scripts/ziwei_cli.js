@@ -4,7 +4,7 @@
  *
  *   chart     GET  /api/ziwei              (free, anonymous)
  *   transits  GET  /api/ziwei?transits=1   (free)
- *   reading   POST /api/ziwei/reading       (paid, needs fs_live_ key)
+ *   reading   POST /api/ziwei/reading       (paid, needs FSFSKey key)
  *   doc       offline interface spec
  *
  * Zero third-party deps (Node built-in https/http). Node >= 12.
@@ -137,9 +137,9 @@ async function cmdReading(args) {
   const apiKey = (args.api_key || process.env.FATESTAR_API_KEY || "").trim();
   if (!apiKey) {
     process.stderr.write(
-      "郑大钱解读需要 fs_live_ key (尚未配置)。\n" +
+      "郑大钱解读需要 FSFSKey key (尚未配置)。\n" +
       "请到 https://www.fatestar.top 注册免费会员 → 做新手任务领积分 →\n" +
-      "开发者中心创建 fs_live_ key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。\n" +
+      "开发者中心创建 FSFSKey key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。\n" +
       "在此之前可用 `chart` 免费排盘, 再自行解读。\n"
     );
     process.exit(2);
@@ -169,7 +169,7 @@ async function cmdReading(args) {
   }
   const err = (resp && resp.error) || {};
   if (status === 401) {
-    process.stderr.write("Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 fs_live_ key。\n");
+    process.stderr.write("Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey key。\n");
   } else if (status === 402) {
     process.stderr.write(
       `积分不足 (402, 需 ${err.need} / 有 ${err.have}), 未扣费。\n` +

@@ -4,7 +4,7 @@
 Thin client over the FateStar engine API:
   chart     GET  /api/ziwei              (free, anonymous)
   transits  GET  /api/ziwei?transits=1   (free)
-  reading   POST /api/ziwei/reading       (paid, needs fs_live_ key)
+  reading   POST /api/ziwei/reading       (paid, needs FSFSKey key)
   doc       offline interface spec
 
 Zero third-party deps (uses the standard-library urllib).
@@ -152,7 +152,7 @@ def cmd_transits(args):
 
 
 def cmd_reading(args):
-    """Paid 郑大钱 reading. Needs an fs_live_ key; degrades gracefully without one."""
+    """Paid 郑大钱 reading. Needs an FSFSKey key; degrades gracefully without one."""
     question = (args.question or "").strip()
     if not question:
         print("Error: --question is required for reading.", file=sys.stderr)
@@ -161,9 +161,9 @@ def cmd_reading(args):
     api_key = (args.api_key or os.environ.get("FATESTAR_API_KEY", "")).strip()
     if not api_key:
         print(
-            "郑大钱解读需要 fs_live_ key (尚未配置)。\n"
+            "郑大钱解读需要 FSFSKey key (尚未配置)。\n"
             "请到 https://www.fatestar.top 注册免费会员 → 做新手任务领积分 →\n"
-            "开发者中心创建 fs_live_ key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。\n"
+            "开发者中心创建 FSFSKey key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。\n"
             "在此之前可用 `chart` 免费排盘, 再自行解读。",
             file=sys.stderr,
         )
@@ -192,7 +192,7 @@ def cmd_reading(args):
 
     err = resp.get("error", {}) if isinstance(resp, dict) else {}
     if status == 401:
-        print("Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 fs_live_ key。", file=sys.stderr)
+        print("Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey key。", file=sys.stderr)
     elif status == 402:
         need, have = err.get("need"), err.get("have")
         print(
@@ -202,7 +202,7 @@ def cmd_reading(args):
             file=sys.stderr,
         )
     else:
-        _handle_api_error(resp, status)
+        _err_from(raw, status)
     sys.exit(1)
 
 
@@ -241,7 +241,7 @@ def _add_birth_args(p, with_targets=False, with_question=False):
         p.add_argument("--target-hour", type=int, default=None, help="Hourly target hour 0-23")
     if with_question:
         p.add_argument("--question", help="The question for 郑大钱 (e.g. 看我今年事业运,该不该跳槽?)")
-        p.add_argument("--api_key", default="", help="fs_live_ key (else .env / env FATESTAR_API_KEY)")
+        p.add_argument("--api_key", default="", help="FSFSKey key (else .env / env FATESTAR_API_KEY)")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -250,7 +250,7 @@ def build_parser() -> argparse.ArgumentParser:
         description=(
             "FateStar Ziwei CLI — Zi Wei Dou Shu (紫微斗数) charting + 郑大钱 AI reading.\n\n"
             "Charting (chart / transits) is free and anonymous. The 郑大钱 reading is paid\n"
-            "(needs an fs_live_ key). Powered by FateStar's self-built engine."
+            "(needs an FSFSKey key). Powered by FateStar's self-built engine."
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
@@ -270,7 +270,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_birth_args(transits_p, with_targets=True)
     transits_p.set_defaults(func=cmd_transits)
 
-    reading_p = sub.add_parser("reading", help="郑大钱 AI reading (paid, needs fs_live_ key)", formatter_class=argparse.RawDescriptionHelpFormatter)
+    reading_p = sub.add_parser("reading", help="郑大钱 AI reading (paid, needs FSFSKey key)", formatter_class=argparse.RawDescriptionHelpFormatter)
     _add_birth_args(reading_p, with_question=True)
     reading_p.set_defaults(func=cmd_reading)
 

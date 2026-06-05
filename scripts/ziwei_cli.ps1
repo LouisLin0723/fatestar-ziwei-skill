@@ -4,7 +4,7 @@
 
   chart     GET  /api/ziwei              (free, anonymous)
   transits  GET  /api/ziwei?transits=1   (free)
-  reading   POST /api/ziwei/reading       (paid, needs fs_live_ key)
+  reading   POST /api/ziwei/reading       (paid, needs FSFSKey key)
   doc       offline interface spec
 
   No external modules. Works on PowerShell 5.1+ and 7+.
@@ -119,9 +119,9 @@ function Cmd-Reading($a) {
     $apiKey = $a["api_key"]
     if (-not $apiKey) { $apiKey = $env:FATESTAR_API_KEY }
     if (-not $apiKey) {
-        [Console]::Error.WriteLine("郑大钱解读需要 fs_live_ key (尚未配置)。")
+        [Console]::Error.WriteLine("郑大钱解读需要 FSFSKey key (尚未配置)。")
         [Console]::Error.WriteLine("请到 https://www.fatestar.top 注册免费会员 → 做新手任务领积分 →")
-        [Console]::Error.WriteLine("开发者中心创建 fs_live_ key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。")
+        [Console]::Error.WriteLine("开发者中心创建 FSFSKey key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。")
         [Console]::Error.WriteLine("在此之前可用 ``chart`` 免费排盘, 再自行解读。")
         exit 2
     }
@@ -138,7 +138,7 @@ function Cmd-Reading($a) {
         return
     }
     if ($r.status -eq 401) {
-        [Console]::Error.WriteLine("Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 fs_live_ key。")
+        [Console]::Error.WriteLine("Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey key。")
     } elseif ($r.status -eq 402) {
         $need = $null; $have = $null
         try { $e = ($r.raw | ConvertFrom-Json).error; $need = $e.need; $have = $e.have } catch {}
