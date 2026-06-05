@@ -15,19 +15,17 @@
 平台有 skill 市场就搜 **ziwei** / **fatestar** 装;否则手动:
 
 ```bash
-# 下载
-curl -L -o fatestar-ziwei-skill.zip https://github.com/LouisLin0723/fatestar-ziwei-skill/archive/refs/heads/main.zip
-# 或: git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
-
-# 解压
-unzip fatestar-ziwei-skill.zip
+# 下载 (git clone 出的目录就叫 fatestar-ziwei-skill)
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
+# 或下载 zip: curl -L -o z.zip https://github.com/LouisLin0723/fatestar-ziwei-skill/archive/refs/heads/main.zip && unzip z.zip
+#   ⚠️ zip 解压出的目录名带后缀 fatestar-ziwei-skill-main, 下方 mv 源名相应改
 
 # 整个目录放进 Agent 的 skills 目录, 命名为 ziwei-paipan
-# Claude Code:     mv fatestar-ziwei-skill-main ~/.claude/skills/ziwei-paipan
-# OpenAI Codex:    mv fatestar-ziwei-skill-main ~/.codex/skills/ziwei-paipan
-# OpenClaw:        mv fatestar-ziwei-skill-main ~/.openclaw/skills/ziwei-paipan
-# Cursor/Windsurf: mv fatestar-ziwei-skill-main <项目>/.skills/ziwei-paipan
-# 多工具共享:       mv fatestar-ziwei-skill-main ~/.agents/skills/ziwei-paipan
+# Claude Code:     mv fatestar-ziwei-skill ~/.claude/skills/ziwei-paipan
+# OpenAI Codex:    mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
+# OpenClaw:        mv fatestar-ziwei-skill ~/.openclaw/skills/ziwei-paipan
+# Cursor/Windsurf: mv fatestar-ziwei-skill <项目>/.skills/ziwei-paipan
+# 多工具共享:       mv fatestar-ziwei-skill ~/.agents/skills/ziwei-paipan
 ```
 
 `~/.agents/skills/` 适合多个 AI 工具读同一目录 (Codex、Cursor、OpenClaw 等)。重启客户端即生效。`SKILL.md` 用通用 frontmatter 格式,Claude / Codex 都识别。
