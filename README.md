@@ -42,11 +42,7 @@ git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
 不想装 skill?同一个引擎也是 MCP server,配置里填一个地址即可:
 
 ```jsonc
-// 远程 (推荐, 零安装)
 { "mcpServers": { "ziwei": { "url": "https://www.fatestar.top/api/mcp" } } }
-
-// 本地 stdio (开源 npm 包, 自带引擎, 断网也能排盘)
-{ "mcpServers": { "ziwei": { "command": "npx", "args": ["-y", "@fatestar/ziwei-mcp"] } } }
 ```
 
 ---
