@@ -1,73 +1,97 @@
 # FateStar Ziwei Skill
 
-> 紫微斗数 (Zi Wei Dou Shu / Purple Star Astrology) 排盘 Skill for AI agents — 把 **FateStar 排盘引擎 + 郑大钱 AI 命理师**封装成跨平台 Agent Skill。装上后对 AI 说「帮我排 1990 年 7 月 23 日早上 8 点出生男性的紫微盘」,即自动出盘 + 专业断盘。
-
-**排盘免费、匿名可用**(不要 key);**郑大钱深度解读**付费(知识引擎 + 古籍锚定,需 `FSFSKey` key)。引擎自建 102 颗星 + 三合派四化 + 真太阳时,**仓库不含引擎源码** —— 4 套 CLI 都是 `https://www.fatestar.top` 的瘦客户端。
-
-[English summary ↓](#english)
+中文在前，English below.
 
 ---
 
-## 下载 & 安装
+## 中文
 
-### 给 AI Agent
+> 紫微斗数（Zi Wei Dou Shu / Purple Star Astrology）排盘 Skill for AI agents。把 **FateStar 排盘数据 + 郑大钱 AI 解读入口**封装成跨平台 Agent Skill。装上后，对 AI 说「帮我排 1990 年 7 月 23 日早上 8 点出生男性的紫微盘」，即可自动调用排盘数据；配置 Key 且积分足够时，可调用郑大钱解读。
 
-平台有 skill 市场就搜 **ziwei** / **fatestar** 装;否则手动:
+**排盘免费、匿名可用**；**郑大钱解读**需 `FSFSKey`，按积分规则计费。
+本仓库是 Agent Skill 与 CLI thin client，不包含 FateStar 服务端、郑大钱人格训练、知识引擎、私有提示词、评测集或检索语料。
+
+### 能力边界
+
+| 能力 | 是否免费 | 是否在本仓库内 |
+| --- | --- | --- |
+| `chart` 本命盘 | 免费 | CLI 调用入口在本仓库；真实计算由 FateStar API 返回 |
+| `transits` 6 层运限 | 免费 | CLI 调用入口在本仓库；真实计算由 FateStar API 返回 |
+| `reading` 郑大钱解读 | 付费，扣积分 | 仅提供调用入口；人格训练与知识引擎在 FateStar 服务端 |
+
+### 开源边界与 know-how 保护
+
+本仓库开源的目标是让用户和 Agent 更容易接入 FateStar，而不是公开郑大钱的核心 know-how。
+
+- 仓库只包含 Skill 定义、4 套 CLI thin client、安装说明与测试计划。
+- 不包含郑大钱人格训练、私有 prompt、知识库、RAG / rerank 策略、评测集、模型路由、反幻觉规则、计费风控或服务端实现。
+- `reading` 只调用 FateStar 托管接口；客户端不会拿到原始 prompt、检索上下文或知识库内容。
+- MIT License 只覆盖本仓库代码；FateStar 品牌、托管服务、郑大钱人格、知识引擎、训练数据与后台策略仍为 FateStar 私有资产。
+- 若你要做二次开发，建议把本仓库当成接入层，而不是命理知识库或郑大钱的实现源码。
+
+### 下载与安装
+
+如果平台有 Skill 市场，搜索 **ziwei** / **fatestar** 安装；否则手动安装：
 
 ```bash
-# 下载 (git clone 出的目录就叫 fatestar-ziwei-skill)
+# 下载
 git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
-# 或下载 zip: curl -L -o z.zip https://github.com/LouisLin0723/fatestar-ziwei-skill/archive/refs/heads/main.zip && unzip z.zip
-#   ⚠️ zip 解压出的目录名带后缀 fatestar-ziwei-skill-main, 下方 mv 源名相应改
 
-# 整个目录放进 Agent 的 skills 目录, 命名为 ziwei-paipan
-# Claude Code:     mv fatestar-ziwei-skill ~/.claude/skills/ziwei-paipan
-# OpenAI Codex:    mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
-# OpenClaw:        mv fatestar-ziwei-skill ~/.openclaw/skills/ziwei-paipan
-# Cursor/Windsurf: mv fatestar-ziwei-skill <项目>/.skills/ziwei-paipan
-# 多工具共享:       mv fatestar-ziwei-skill ~/.agents/skills/ziwei-paipan
+# 或下载 zip
+curl -L -o z.zip https://github.com/LouisLin0723/fatestar-ziwei-skill/archive/refs/heads/master.zip
+unzip z.zip
+
+# zip 解压出的目录名是 fatestar-ziwei-skill-master
+# 把整个目录放进 Agent 的 skills 目录，命名为 ziwei-paipan
+mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
 ```
 
-`~/.agents/skills/` 适合多个 AI 工具读同一目录 (Codex、Cursor、OpenClaw 等)。重启客户端即生效。`SKILL.md` 用通用 frontmatter 格式,Claude / Codex 都识别。
+常见目录：
 
-### 给人类
+```bash
+# Claude Code
+mv fatestar-ziwei-skill ~/.claude/skills/ziwei-paipan
 
-1. 下载 zip 或 `git clone`
-2. 解压,整个目录改名 `ziwei-paipan` 放进 Agent 的 skills 目录
-3.(可选)配一个 `FSFSKey` key 解锁郑大钱解读(见下)
-4. 跑装后验证,再问「帮我排…的紫微盘」
+# OpenAI Codex
+mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
 
-### 零安装替代:远程 MCP
+# OpenClaw
+mv fatestar-ziwei-skill ~/.openclaw/skills/ziwei-paipan
 
-不想装 skill?同一个引擎也是 MCP server,配置里填一个地址即可:
+# Cursor / Windsurf 项目内
+mv fatestar-ziwei-skill <项目>/.skills/ziwei-paipan
+
+# 多工具共享
+mv fatestar-ziwei-skill ~/.agents/skills/ziwei-paipan
+```
+
+重启客户端后生效。`SKILL.md` 使用通用 frontmatter 格式，Claude / Codex 等 Agent 都能读取。
+
+### 零安装替代：远程 MCP
+
+不想安装 Skill 时，可直接使用同一个 FateStar 远程 MCP：
 
 ```jsonc
-{ "mcpServers": { "ziwei": { "url": "https://www.fatestar.top/api/mcp" } } }
+{
+  "mcpServers": {
+    "ziwei": { "url": "https://www.fatestar.top/api/mcp" }
+  }
+}
 ```
 
----
+完整 MCP 文档见：<https://github.com/LouisLin0723/fatestar-ziwei-mcp>
 
-## API Key 配置(一个 key 搞定)
+### API Key 配置
 
-**你只需要一个 `FSFSKey` key。** 排盘(`chart` / `transits`)免费、匿名可用;只有「郑大钱」专业解读(`reading`)才需 key、才扣积分。
-
-### 默认行为(重要)
-
-问命理问题(事业 / 财运 / 感情 / 健康 / 该不该…)时,skill 会:
-
-1. **默认先用郑大钱回答** —— 免费会员每天 **3 积分**(北京时间 **21:00** 重置)。知识引擎 + 郑大钱人格 + 古籍锚定,比 AI 自己瞎解读准得多。
-2. **积分用完 → 自动切回你自己的 LLM** —— skill 检测到 `402`(积分耗尽),无缝改用 **Agent 本身的模型** + `chart` 免费排盘兜底,并提示你充值或等 21:00 重置。
-
-不会卡住,降级无感。
-
-### 怎么配 key
+排盘（`chart` / `transits`）免费、匿名可用；只有「郑大钱」解读（`reading`）需要 `FSFSKey`，并按积分规则计费。
 
 ```bash
 cp .env.example .env
-# 编辑 .env, 填: FATESTAR_API_KEY=FSFSKey20260606XXXXXXXXXXXXXXXXXXXX
+# 编辑 .env，填入：
+FATESTAR_API_KEY=FSFSKey20260606XXXXXXXXXXXXXXXXXXXX
 ```
 
-或直接设环境变量:
+也可以设置环境变量：
 
 ```bash
 export FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"    # Linux / macOS
@@ -75,36 +99,34 @@ set FATESTAR_API_KEY=FSFSKey20260606XXXXXXXXXXXXXXXXXXXX         # Windows CMD
 $env:FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"      # Windows PowerShell
 ```
 
-### 拿一个 key
+拿 Key：访问 <https://www.fatestar.top> → 注册免费会员 → 做新手任务领积分 → 开发者中心创建 `FSFSKey`。
 
-访问 **https://www.fatestar.top** → 注册免费会员 → 做新手任务领积分 → 开发者中心创建固定的 `FSFSKey` key(可重复使用)。
+### 默认行为
 
-### 能力优先级
+问事业、财运、感情、健康、该不该等命理问题时，Skill 会：
 
-> 带 key 且有积分 → **郑大钱解读**(扣积分,最准)→ 积分用完 → **你自己的 LLM**(兜底)→ 纯排盘数据(**永远免费,不要 key**)
+1. 优先调用郑大钱解读。该路径使用 FateStar 知识引擎与郑大钱人格，需要 Key 和积分。
+2. 如果未配置 Key 或积分不足，回退到 `chart` 免费排盘 + Agent 自身模型解释，并明确提示当前不是郑大钱解读。
 
-Key 优先级: `--api_key` 参数 > `.env` 文件 > 环境变量 > 匿名。
+能力优先级：
 
----
-
-## 装后验证
-
-### 第 1 步:探测可用 runtime
-
-按顺序跑,第一个成功的决定用哪个 CLI:
-
-```bash
-python --version    # 需 >= 3.6 (纯标准库, 无需 pip install)
-python3 --version   # macOS 常只有 python3
-node --version      # 需 >= 12, 零外部依赖
-# Shell 兜底: Windows PowerShell 5.1+ / Linux·macOS bash 4+ 带 curl
+```text
+带 Key 且有积分 → 郑大钱解读（扣积分）
+积分不足 / 未配置 Key → 免费排盘数据 + Agent 自身模型解释
+只要命盘数据 → chart / transits 免费匿名调用
 ```
 
-优先级:**Python > Node.js > PowerShell / Bash**
+### 装后验证
 
-### 第 2 步:跑 entry test(每个可用 runtime 各跑一次)
+先探测可用 runtime：
 
-`doc` 离线(不联网),打印完整接口规范:
+```bash
+python --version    # 需 >= 3.6，纯标准库，无需 pip install
+python3 --version   # macOS 常只有 python3
+node --version      # 需 >= 12，零外部依赖
+```
+
+跑离线接口规范：
 
 ```bash
 python  scripts/ziwei_cli.py  doc
@@ -113,107 +135,210 @@ powershell -ExecutionPolicy Bypass -File scripts/ziwei_cli.ps1 doc
 bash    scripts/ziwei_cli.sh  doc
 ```
 
-### 第 3 步:把推荐 runtime 写进 runtime.conf
+把推荐 runtime 写进 `runtime.conf`：
 
 ```bash
 echo "Runtime: Python" > runtime.conf
 echo "Command: python scripts/ziwei_cli.py" >> runtime.conf
 ```
 
-其他例子:`python3 scripts/ziwei_cli.py` / `node scripts/ziwei_cli.js` / `powershell -ExecutionPolicy Bypass -File scripts/ziwei_cli.ps1` / `bash scripts/ziwei_cli.sh`。
-
-**重要:** runtime 偏好存在 `runtime.conf`,不在 SKILL.md。Agent 加载时读 `runtime.conf` 选 CLI;文件缺失/损坏则回退 SKILL.md 的平台探测流程。已存在就替换,别追加。
-
-### 日常用法
-
-`runtime.conf` 就位后,直接用存好的 `Command`。以 `python scripts/ziwei_cli.py` 为例:
+### CLI 用法
 
 ```bash
 # 免费排本命盘
 python scripts/ziwei_cli.py chart --year 1990 --month 7 --day 23 --hour 8 --gender male
 
-# 免费排 2026 流年(6 层运限)
+# 免费排 2026 流年（6 层运限）
 python scripts/ziwei_cli.py transits --year 1990 --month 7 --day 23 --hour 8 --gender male --target-year 2026
 
-# 郑大钱解读(付费, 需 FSFSKey key)
-python scripts/ziwei_cli.py reading --year 1990 --month 7 --day 23 --hour 8 --gender male --question "看我今年事业运,该不该跳槽?"
+# 郑大钱解读（付费，需 FSFSKey）
+python scripts/ziwei_cli.py reading --year 1990 --month 7 --day 23 --hour 8 --gender male --question "看我今年事业运，该不该跳槽？"
 ```
 
-`chart` / `transits` 直接打印命盘 JSON(免费);`reading` 打印郑大钱解读全文。
+### 自然语言触发示例
 
-### 第 4 步(可选):测一次真排盘
+装好后，直接对 AI 说：
 
-```bash
-python scripts/ziwei_cli.py chart --year 1990 --month 7 --day 23 --hour 8 --gender male
-```
+> 帮我排 1995 年 3 月 12 日下午 2 点出生女性的紫微命盘，看看事业。
 
-返回 JSON 命盘 = API 连通成功。
+Agent 会先拿排盘数据；如果有 Key 且积分足够，再调用郑大钱解读。否则会用 Agent 自身模型基于免费排盘数据解释。
 
----
+### 文件结构
 
-## 自然语言触发示例
-
-装好后,直接对 AI 说:
-
-> 帮我排 1995 年 3 月 12 日下午 2 点出生女性的紫微命盘,看看事业。
-
-AI 自动调引擎拿十二宫 + 四化 + 格局 → 默认郑大钱断盘(有 key 有积分)→ 否则自己解读。
-
-| 测试 | 说什么 | 成功标志 |
-|---|---|---|
-| 排盘(免费) | 「帮我排 1990 年 7 月 23 日早上 8 点、男 的紫微盘」 | 出完整命盘 |
-| 解读(扣积分) | 「我今年事业运如何?该不该跳槽?」 | 郑大钱断盘(需 key + 积分) |
-
----
-
-## 文件结构
-
-```
-ziwei-paipan/                 (本仓库, 改名后放进 skills 目录)
-├── .env.example              # API key 模板
-├── .env                      # 你的 key (gitignore, 从 .env.example 复制)
-├── runtime.conf              # 探测到的 runtime (gitignore)
-├── runtime.conf.example      # runtime 模板
-├── SKILL.md                  # 给 AI 读的 Skill 定义 (SOP + 命令速查)
-├── README.md                 # 本文件
-├── SECURITY.md               # 漏洞上报政策
-├── TEST_PLAN.md              # 端到端测试场景
-├── LICENSE                   # MIT
+```text
+ziwei-paipan/
+├── .env.example
+├── runtime.conf.example
+├── SKILL.md
+├── README.md
+├── SECURITY.md
+├── TEST_PLAN.md
 └── scripts/
-    ├── ziwei_cli.py          # Python CLI (纯标准库)
-    ├── ziwei_cli.js          # Node.js CLI (内置 https)
-    ├── ziwei_cli.ps1         # PowerShell CLI (UTF-8 BOM)
-    ├── ziwei_cli.sh          # Bash CLI (curl; reading 配 jq 更佳)
-    ├── generate.py           # 从 shared 同步 4 个 CLI 的公共块
+    ├── ziwei_cli.py
+    ├── ziwei_cli.js
+    ├── ziwei_cli.ps1
+    ├── ziwei_cli.sh
+    ├── generate.py
     └── shared/
-        ├── constants.json    # API 地址 + 端点 + 枚举
-        └── doc_spec.md        # 接口规范模板 (doc 命令渲染它)
+        ├── constants.json
+        └── doc_spec.md
 ```
 
-更多接入(MCP / REST API / 各 Agent 客户端速查)→ **https://www.fatestar.top/docs**
+更多接入（MCP / REST API / 各 Agent 客户端速查）：<https://www.fatestar.top/docs>
 
 ---
 
-<a name="english"></a>
 ## English
 
-**Zi Wei Dou Shu (Purple Star Astrology) skill for AI agents.** Wraps FateStar's
-self-built charting engine + the 郑大钱 (Zheng Da Qian) AI master into a cross-platform
-Agent Skill. Charting (`chart` / `transits`) is **free and anonymous**; the 郑大钱 reading
-(`reading`) is paid (needs an `FSFSKey` key). No engine source here — the four CLIs
-(Python / Node.js / PowerShell / Bash) are thin clients over `https://www.fatestar.top`.
+> FateStar Ziwei Skill is a cross-platform Agent Skill for Zi Wei Dou Shu (Purple Star Astrology). It lets AI agents call FateStar charting data and, when an `FSFSKey` with credits is configured, the paid Zheng Da Qian AI reading endpoint.
 
-Install: download the zip, move it into your agent's skills dir as `ziwei-paipan`, then
-detect a runtime and write `runtime.conf`. Routine calls:
+Charting is free and anonymous. Zheng Da Qian readings require an `FSFSKey` and are charged by credits.
+This repository is an Agent Skill plus CLI thin clients. It does **not** include FateStar's server-side implementation, Zheng Da Qian persona training, knowledge engine, private prompts, evaluation sets, retrieval corpus, or anti-hallucination rules.
+
+### Capability Boundary
+
+| Capability | Billing | Included in this repo |
+| --- | --- | --- |
+| `chart` natal chart | Free | CLI entrypoint only; data is returned by the FateStar API |
+| `transits` six transit levels | Free | CLI entrypoint only; data is returned by the FateStar API |
+| `reading` Zheng Da Qian reading | Paid credits | API entrypoint only; persona training and knowledge engine stay server-side |
+
+### Open-Source Boundary and Know-How Protection
+
+This repository is open so users and agents can integrate with FateStar easily. It is not a release of Zheng Da Qian's core know-how.
+
+- The repo contains Skill metadata, four CLI thin clients, installation docs, and a test plan.
+- It does not contain private prompts, persona training data, knowledge base content, RAG / reranking logic, evaluation data, model routing, anti-hallucination rules, billing controls, or server implementation.
+- `reading` calls the hosted FateStar endpoint. The client never receives raw prompts, retrieval context, or private corpus content.
+- The MIT License applies to this repository's code. FateStar's brand, hosted service, Zheng Da Qian persona, knowledge engine, training data, and backend strategy remain proprietary FateStar assets.
+- For forks or integrations, treat this repository as the integration layer, not as the implementation of FateStar's interpretation engine.
+
+### Installation
+
+If your platform has a Skill marketplace, search **ziwei** or **fatestar**. Otherwise install manually:
 
 ```bash
-python scripts/ziwei_cli.py chart    --year 1990 --month 7 --day 23 --hour 8 --gender male
-python scripts/ziwei_cli.py transits --year 1990 --month 7 --day 23 --hour 8 --gender male --target-year 2026
-python scripts/ziwei_cli.py reading  --year 1990 --month 7 --day 23 --hour 8 --gender male --question "..."
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
+
+# Or download the zip
+curl -L -o z.zip https://github.com/LouisLin0723/fatestar-ziwei-skill/archive/refs/heads/master.zip
+unzip z.zip
+
+# Put the whole directory into your agent's skills directory as ziwei-paipan
+mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
 ```
 
-Zero-install alternative — remote MCP: `{ "mcpServers": { "ziwei": { "url": "https://www.fatestar.top/api/mcp" } } }`
+Common locations:
+
+```bash
+# Claude Code
+mv fatestar-ziwei-skill ~/.claude/skills/ziwei-paipan
+
+# OpenAI Codex
+mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
+
+# OpenClaw
+mv fatestar-ziwei-skill ~/.openclaw/skills/ziwei-paipan
+
+# Cursor / Windsurf project
+mv fatestar-ziwei-skill <project>/.skills/ziwei-paipan
+
+# Shared by multiple tools
+mv fatestar-ziwei-skill ~/.agents/skills/ziwei-paipan
+```
+
+Restart the client after installation.
+
+### Zero-Install Alternative: Remote MCP
+
+Use the same FateStar engine through the hosted remote MCP endpoint:
+
+```jsonc
+{
+  "mcpServers": {
+    "ziwei": { "url": "https://www.fatestar.top/api/mcp" }
+  }
+}
+```
+
+Remote MCP docs: <https://github.com/LouisLin0723/fatestar-ziwei-mcp>
+
+### API Key
+
+`chart` and `transits` are free and anonymous. Only `reading` requires an `FSFSKey`.
+
+```bash
+cp .env.example .env
+# Edit .env:
+FATESTAR_API_KEY=FSFSKey20260606XXXXXXXXXXXXXXXXXXXX
+```
+
+Or set an environment variable:
+
+```bash
+export FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"    # Linux / macOS
+set FATESTAR_API_KEY=FSFSKey20260606XXXXXXXXXXXXXXXXXXXX         # Windows CMD
+$env:FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"      # Windows PowerShell
+```
+
+Get a key at <https://www.fatestar.top>: sign up, claim starter credits, then create an `FSFSKey` in the developer center.
+
+### Default Behavior
+
+For astrology questions about career, money, relationships, health, timing, or decisions, the Skill:
+
+1. Tries Zheng Da Qian first when a valid Key and credits are available.
+2. Falls back to free `chart` data plus the agent's own model explanation when no Key is configured or credits are insufficient.
+
+Priority:
+
+```text
+Valid Key + credits → Zheng Da Qian reading
+No Key / insufficient credits → free chart data + agent model explanation
+Chart data only → chart / transits free anonymous calls
+```
+
+### Verification
+
+Probe runtimes:
+
+```bash
+python --version
+python3 --version
+node --version
+```
+
+Run the offline spec:
+
+```bash
+python  scripts/ziwei_cli.py  doc
+node    scripts/ziwei_cli.js  doc
+powershell -ExecutionPolicy Bypass -File scripts/ziwei_cli.ps1 doc
+bash    scripts/ziwei_cli.sh  doc
+```
+
+Write `runtime.conf`:
+
+```bash
+echo "Runtime: Python" > runtime.conf
+echo "Command: python scripts/ziwei_cli.py" >> runtime.conf
+```
+
+### CLI Examples
+
+```bash
+# Free natal chart
+python scripts/ziwei_cli.py chart --year 1990 --month 7 --day 23 --hour 8 --gender male
+
+# Free 2026 transits
+python scripts/ziwei_cli.py transits --year 1990 --month 7 --day 23 --hour 8 --gender male --target-year 2026
+
+# Paid Zheng Da Qian reading
+python scripts/ziwei_cli.py reading --year 1990 --month 7 --day 23 --hour 8 --gender male --question "How is my career this year?"
+```
+
+Full developer docs: <https://www.fatestar.top/docs>
 
 ---
 
-MIT licensed · Powered by [FateStar](https://www.fatestar.top) · 排盘引擎自建,只讲真话。
+MIT licensed. Powered by [FateStar](https://www.fatestar.top).

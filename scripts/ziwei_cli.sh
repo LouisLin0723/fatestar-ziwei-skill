@@ -3,7 +3,7 @@
 #
 #   chart     GET  /api/ziwei              (free, anonymous)
 #   transits  GET  /api/ziwei?transits=1   (free)
-#   reading   POST /api/ziwei/reading       (paid, needs FSFSKey key)
+#   reading   POST /api/ziwei/reading       (paid, needs FSFSKey)
 #   doc       offline interface spec
 #
 # Requires: bash 4+, curl. (reading extracts cleanest output when jq is present.)
@@ -161,10 +161,10 @@ cmd_reading() {
   local key="${ARGS[api_key]:-${FATESTAR_API_KEY:-}}"
   if [ -z "$key" ]; then
     {
-      echo "郑大钱解读需要 FSFSKey key (尚未配置)。"
+      echo "郑大钱解读需要 FSFSKey（尚未配置）。"
       echo "请到 https://www.fatestar.top 注册免费会员 → 做新手任务领积分 →"
-      echo "开发者中心创建 FSFSKey key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。"
-      echo "在此之前可用 \`chart\` 免费排盘, 再自行解读。"
+      echo "开发者中心创建 FSFSKey → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。"
+      echo "在此之前可用 \`chart\` 免费排盘，再由 Agent 自身模型解释。"
     } >&2
     exit 2
   fi
@@ -172,7 +172,7 @@ cmd_reading() {
   if [ "$RESP_STATUS" = "200" ]; then
     if has_jq; then
       local reading; reading=$(printf '%s' "$RESP_BODY" | jq -r '.data.reading // empty')
-      if [ -z "$reading" ]; then echo "郑大钱解读失败: 空回复 (未扣费), 请重试。" >&2; exit 1; fi
+      if [ -z "$reading" ]; then echo "郑大钱解读失败：空回复（未扣费），请重试。" >&2; exit 1; fi
       printf '%s\n' "$reading"
       local used after; used=$(printf '%s' "$RESP_BODY" | jq -r '.data.creditsUsed // empty'); after=$(printf '%s' "$RESP_BODY" | jq -r '.data.balanceAfter // empty')
       echo "" >&2; echo "---" >&2; echo "[积分] 本次扣除 $used, 剩余 $after" >&2
@@ -183,14 +183,14 @@ cmd_reading() {
     return
   fi
   case "$RESP_STATUS" in
-    401) echo "Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey key。" >&2;;
+    401) echo "Key 无效或已失效 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey。" >&2;;
     402)
       local need have
       if has_jq; then need=$(printf '%s' "$RESP_BODY" | jq -r '.error.need // empty'); have=$(printf '%s' "$RESP_BODY" | jq -r '.error.have // empty'); fi
       {
         echo "积分不足 (402, 需 ${need:-?} / 有 ${have:-?}), 未扣费。"
-        echo "请到 https://www.fatestar.top 充值, 或等北京时间 21:00 免费重置 (每日 3 积分)。"
-        echo "现在可改用 \`chart\` 拿命盘数据 + 自行解读兜底。"
+        echo "请到 https://www.fatestar.top 充值，或等北京时间 21:00 免费重置（每日 3 积分）。"
+        echo "现在可改用 \`chart\` 拿命盘数据 + Agent 自身模型解释兜底。"
       } >&2;;
     *) err_from "$RESP_BODY" "$RESP_STATUS";;
   esac

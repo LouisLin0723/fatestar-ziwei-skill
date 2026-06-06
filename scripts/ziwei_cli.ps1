@@ -4,7 +4,7 @@
 
   chart     GET  /api/ziwei              (free, anonymous)
   transits  GET  /api/ziwei?transits=1   (free)
-  reading   POST /api/ziwei/reading       (paid, needs FSFSKey key)
+  reading   POST /api/ziwei/reading       (paid, needs FSFSKey)
   doc       offline interface spec
 
   No external modules. Works on PowerShell 5.1+ and 7+.
@@ -119,10 +119,10 @@ function Cmd-Reading($a) {
     $apiKey = $a["api_key"]
     if (-not $apiKey) { $apiKey = $env:FATESTAR_API_KEY }
     if (-not $apiKey) {
-        [Console]::Error.WriteLine("郑大钱解读需要 FSFSKey key (尚未配置)。")
+        [Console]::Error.WriteLine("郑大钱解读需要 FSFSKey（尚未配置）。")
         [Console]::Error.WriteLine("请到 https://www.fatestar.top 注册免费会员 → 做新手任务领积分 →")
-        [Console]::Error.WriteLine("开发者中心创建 FSFSKey key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。")
-        [Console]::Error.WriteLine("在此之前可用 ``chart`` 免费排盘, 再自行解读。")
+        [Console]::Error.WriteLine("开发者中心创建 FSFSKey → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。")
+        [Console]::Error.WriteLine("在此之前可用 ``chart`` 免费排盘，再由 Agent 自身模型解释。")
         exit 2
     }
     $bodyObj = Build-BirthParams $a
@@ -132,19 +132,19 @@ function Cmd-Reading($a) {
     if ($r.status -eq 200) {
         $d = $null
         try { $d = ($r.raw | ConvertFrom-Json).data } catch {}
-        if (-not $d -or -not $d.reading) { [Console]::Error.WriteLine("郑大钱解读失败: 空回复 (未扣费), 请重试。"); exit 1 }
+        if (-not $d -or -not $d.reading) { [Console]::Error.WriteLine("郑大钱解读失败：空回复（未扣费），请重试。"); exit 1 }
         Write-Output $d.reading
         [Console]::Error.WriteLine("`n---`n[积分] 本次扣除 $($d.creditsUsed), 剩余 $($d.balanceAfter)")
         return
     }
     if ($r.status -eq 401) {
-        [Console]::Error.WriteLine("Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey key。")
+        [Console]::Error.WriteLine("Key 无效或已失效 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey。")
     } elseif ($r.status -eq 402) {
         $need = $null; $have = $null
         try { $e = ($r.raw | ConvertFrom-Json).error; $need = $e.need; $have = $e.have } catch {}
         [Console]::Error.WriteLine("积分不足 (402, 需 $need / 有 $have), 未扣费。")
-        [Console]::Error.WriteLine("请到 https://www.fatestar.top 充值, 或等北京时间 21:00 免费重置 (每日 3 积分)。")
-        [Console]::Error.WriteLine("现在可改用 ``chart`` 拿命盘数据 + 自行解读兜底。")
+        [Console]::Error.WriteLine("请到 https://www.fatestar.top 充值，或等北京时间 21:00 免费重置（每日 3 积分）。")
+        [Console]::Error.WriteLine("现在可改用 ``chart`` 拿命盘数据 + Agent 自身模型解释兜底。")
     } else {
         Err-From $r.raw $r.status
     }

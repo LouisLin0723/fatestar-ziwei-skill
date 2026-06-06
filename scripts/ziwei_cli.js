@@ -4,7 +4,7 @@
  *
  *   chart     GET  /api/ziwei              (free, anonymous)
  *   transits  GET  /api/ziwei?transits=1   (free)
- *   reading   POST /api/ziwei/reading       (paid, needs FSFSKey key)
+ *   reading   POST /api/ziwei/reading       (paid, needs FSFSKey)
  *   doc       offline interface spec
  *
  * Zero third-party deps (Node built-in https/http). Node >= 12.
@@ -137,10 +137,10 @@ async function cmdReading(args) {
   const apiKey = (args.api_key || process.env.FATESTAR_API_KEY || "").trim();
   if (!apiKey) {
     process.stderr.write(
-      "郑大钱解读需要 FSFSKey key (尚未配置)。\n" +
+      "郑大钱解读需要 FSFSKey（尚未配置）。\n" +
       "请到 https://www.fatestar.top 注册免费会员 → 做新手任务领积分 →\n" +
-      "开发者中心创建 FSFSKey key → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。\n" +
-      "在此之前可用 `chart` 免费排盘, 再自行解读。\n"
+      "开发者中心创建 FSFSKey → 写进 .env (FATESTAR_API_KEY=) 或用 --api_key 传入。\n" +
+      "在此之前可用 `chart` 免费排盘，再由 Agent 自身模型解释。\n"
     );
     process.exit(2);
   }
@@ -158,7 +158,7 @@ async function cmdReading(args) {
   if (status === 200) {
     const data = resp.data || {};
     if (!data.reading) {
-      process.stderr.write("郑大钱解读失败: 空回复 (未扣费), 请重试。\n");
+      process.stderr.write("郑大钱解读失败：空回复（未扣费），请重试。\n");
       process.exit(1);
     }
     process.stdout.write(data.reading + "\n");
@@ -169,12 +169,12 @@ async function cmdReading(args) {
   }
   const err = (resp && resp.error) || {};
   if (status === 401) {
-    process.stderr.write("Key 无效或已吊销 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey key。\n");
+    process.stderr.write("Key 无效或已失效 (401)。请到 https://www.fatestar.top 开发者中心确认或重新申请 FSFSKey。\n");
   } else if (status === 402) {
     process.stderr.write(
       `积分不足 (402, 需 ${err.need} / 有 ${err.have}), 未扣费。\n` +
-      "请到 https://www.fatestar.top 充值, 或等北京时间 21:00 免费重置 (每日 3 积分)。\n" +
-      "现在可改用 `chart` 拿命盘数据 + 自行解读兜底。\n"
+      "请到 https://www.fatestar.top 充值，或等北京时间 21:00 免费重置（每日 3 积分）。\n" +
+      "现在可改用 `chart` 拿命盘数据 + Agent 自身模型解释兜底。\n"
     );
   } else {
     errFrom(raw, status);
