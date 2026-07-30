@@ -1,21 +1,14 @@
 ---
 name: ziwei-paipan
 description: 紫微斗数排盘 + 郑大钱 AI 解读 — 输入出生年月日时 + 性别，调 FateStar 排盘引擎生成命盘 + 运限，并可调「郑大钱」AI 命理师深度断盘。当用户说「排紫微盘 / 紫微斗数 / 帮我排盘 / 算命 / 看命盘 / 问事业财运感情健康 / 我的运势 / 今年怎么样 / 该不该…」并给出生信息时触发。Zi Wei Dou Shu (Purple Star Astrology) charting + expert AI reading.
-version: 2.0.0
-authors:
-  - FateStar (https://www.fatestar.top)
-credentials:
-  - name: FATESTAR_API_KEY
-    required: false
-    description: "FSFSKey 开头的开发者 Key，仅「郑大钱」解读 (reading) 及命盘仓库/积分/邀请等账号能力需要；纯排盘 (chart / transits) 免费匿名无需 Key。"
-    storage: ".env 文件 / 环境变量 / --api_key 参数"
 ---
 
 ## 概述
 
 紫微斗数排盘 + 郑大钱 AI 解读，引擎为 FateStar 自建（102 颗星 · 三合派四化 · 真太阳时）。三个核心 CLI 命令 + 一组账号能力（curl）。
+当前 Skill 版本：2.1.0。
 
-- **排盘免费匿名**（chart / transits）
+- **排盘免费**（chart / transits）；可匿名，也可带 Key 让后台识别用户，均不扣积分
 - **郑大钱解读付费**（reading，扣积分，需 FSFSKey）。使用 FateStar 知识引擎与郑大钱人格；未配置 Key 或积分不足时，回退为免费排盘 + Agent 自身模型解释。
 
 ## 能力速查表（用户问「你能干啥」时，把这张表展示给他）
@@ -59,11 +52,16 @@ reading 解读**自动含运限**（内部已算流年/流月/流日/大限喂�
 <cmd> reading --year 1990 --month 7 --day 23 --hour 8 --gender male --question "今年事业运?"
 ```
 
+已配置 `FATESTAR_API_KEY` 时，`chart` / `transits` 会自动携带 Key 与
+`X-FateStar-Client: skill/2.1.0`。免费接口仍不扣积分，只用于统计用户和来源。
+
 **reading 高级参数**（CLI 未覆盖的，用 curl 直调 API 传）：
 
 ```bash
 curl -X POST "https://www.fatestar.top/api/ziwei/reading" \
-  -H "Authorization: Bearer FSFSKey你的key" -H "Content-Type: application/json" \
+  -H "Authorization: Bearer FSFSKey你的key" \
+  -H "X-FateStar-Client: skill/2.1.0" \
+  -H "Content-Type: application/json" \
   -d '{
     "year":1990,"month":7,"day":23,"hour":8,"gender":"male",
     "question":"2028 年我适合创业吗?",
@@ -114,7 +112,7 @@ curl -X DELETE "https://www.fatestar.top/api/charts/<chartId>" -H "Authorization
 
 ## API Key 管理
 
-优先级：`--api_key` 参数 > `.env` (FATESTAR_API_KEY) > 环境变量 > 匿名（仅排盘）。排盘匿名免费；reading + 账号能力（命盘仓库/积分/邀请）需 Key。用户在聊天里给 Key → 建议改配到 `.env`/环境变量（更安全）。
+优先级：`--api_key` 参数 > `.env` (FATESTAR_API_KEY) > 环境变量 > 匿名（仅排盘）。有 Key 时免费排盘也会携带，以便 FateStar 后台识别为 Skill 用户，但不会扣积分。reading + 账号能力（命盘仓库/积分/邀请）需 Key。用户在聊天里给 Key → 建议改配到 `.env`/环境变量（更安全）。
 
 ## 平台探测 & CLI 路由
 

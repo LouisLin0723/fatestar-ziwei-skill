@@ -8,7 +8,7 @@
 
 > 紫微斗数（Zi Wei Dou Shu / Purple Star Astrology）排盘 Skill for AI agents。把 **FateStar 排盘数据 + 郑大钱 AI 解读入口**封装成跨平台 Agent Skill。装上后，对 AI 说「帮我排 1990 年 7 月 23 日早上 8 点出生男性的紫微盘」，即可自动调用排盘数据；配置 Key 且积分足够时，可调用郑大钱解读。
 
-**排盘免费、匿名可用**；**郑大钱解读**需 `FSFSKey`，按积分规则计费。
+当前版本：**2.1.0**。**排盘免费、可匿名使用**；配置 `FSFSKey` 后免费排盘仍不扣积分，只用于识别用户。**郑大钱解读**需 `FSFSKey`，按积分规则计费。
 本仓库是 Agent Skill 与 CLI thin client，不包含 FateStar 服务端、郑大钱人格训练、知识引擎、私有提示词、评测集或检索语料。
 
 ### 能力边界
@@ -34,8 +34,9 @@
 如果平台有 Skill 市场，搜索 **ziwei** / **fatestar** 安装；否则手动安装：
 
 ```bash
-# 下载
-git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
+# 直接克隆到 Skill 名称一致的目录（二选一）
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git ~/.claude/skills/ziwei-paipan
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git ~/.codex/skills/ziwei-paipan
 
 # 或下载 zip
 curl -L -o z.zip https://github.com/LouisLin0723/fatestar-ziwei-skill/archive/refs/heads/master.zip
@@ -43,26 +44,20 @@ unzip z.zip
 
 # zip 解压出的目录名是 fatestar-ziwei-skill-master
 # 把整个目录放进 Agent 的 skills 目录，命名为 ziwei-paipan
-mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
+mv fatestar-ziwei-skill-master ~/.codex/skills/ziwei-paipan
 ```
 
 常见目录：
 
 ```bash
-# Claude Code
-mv fatestar-ziwei-skill ~/.claude/skills/ziwei-paipan
-
-# OpenAI Codex
-mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
-
 # OpenClaw
-mv fatestar-ziwei-skill ~/.openclaw/skills/ziwei-paipan
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git ~/.openclaw/skills/ziwei-paipan
 
 # Cursor / Windsurf 项目内
-mv fatestar-ziwei-skill <项目>/.skills/ziwei-paipan
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git <项目>/.skills/ziwei-paipan
 
 # 多工具共享
-mv fatestar-ziwei-skill ~/.agents/skills/ziwei-paipan
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git ~/.agents/skills/ziwei-paipan
 ```
 
 重启客户端后生效。`SKILL.md` 使用通用 frontmatter 格式，Claude / Codex 等 Agent 都能读取。
@@ -83,7 +78,7 @@ mv fatestar-ziwei-skill ~/.agents/skills/ziwei-paipan
 
 ### API Key 配置
 
-排盘（`chart` / `transits`）免费、匿名可用；只有「郑大钱」解读（`reading`）需要 `FSFSKey`，并按积分规则计费。
+排盘（`chart` / `transits`）免费、可匿名使用；配置 Key 后，CLI 会在免费排盘时也携带它做用户归属，但不会扣积分。只有「郑大钱」解读（`reading`）必须使用 `FSFSKey`，并按积分规则计费。
 
 ```bash
 cp .env.example .env
@@ -101,6 +96,8 @@ $env:FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"      # Windows Power
 
 拿 Key：访问 <https://www.fatestar.top> → 注册免费会员 → 做新手任务领积分 → 开发者中心创建 `FSFSKey`。
 
+所有 CLI 请求都会发送 `X-FateStar-Client: skill/2.1.0`。FateStar 后台据此区分 Skill / MCP / API；用户身份仍只认服务器验证过的 Key。
+
 ### 默认行为
 
 问事业、财运、感情、健康、该不该等命理问题时，Skill 会：
@@ -113,7 +110,7 @@ $env:FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"      # Windows Power
 ```text
 带 Key 且有积分 → 郑大钱解读（扣积分）
 积分不足 / 未配置 Key → 免费排盘数据 + Agent 自身模型解释
-只要命盘数据 → chart / transits 免费匿名调用
+只要命盘数据 → chart / transits 免费调用（Key 可选）
 ```
 
 ### 装后验证
@@ -192,7 +189,7 @@ ziwei-paipan/
 
 > FateStar Ziwei Skill is a cross-platform Agent Skill for Zi Wei Dou Shu (Purple Star Astrology). It lets AI agents call FateStar charting data and, when an `FSFSKey` with credits is configured, the paid Zheng Da Qian AI reading endpoint.
 
-Charting is free and anonymous. Zheng Da Qian readings require an `FSFSKey` and are charged by credits.
+Current version: **2.1.0**. Charting is free and may be anonymous. If a key is configured, free requests carry it only for account attribution and remain free. Zheng Da Qian readings require an `FSFSKey` and are charged by credits.
 This repository is an Agent Skill plus CLI thin clients. It does **not** include FateStar's server-side implementation, Zheng Da Qian persona training, knowledge engine, private prompts, evaluation sets, retrieval corpus, or anti-hallucination rules.
 
 ### Capability Boundary
@@ -218,33 +215,27 @@ This repository is open so users and agents can integrate with FateStar easily. 
 If your platform has a Skill marketplace, search **ziwei** or **fatestar**. Otherwise install manually:
 
 ```bash
-git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git ~/.codex/skills/ziwei-paipan
 
 # Or download the zip
 curl -L -o z.zip https://github.com/LouisLin0723/fatestar-ziwei-skill/archive/refs/heads/master.zip
 unzip z.zip
 
 # Put the whole directory into your agent's skills directory as ziwei-paipan
-mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
+mv fatestar-ziwei-skill-master ~/.codex/skills/ziwei-paipan
 ```
 
 Common locations:
 
 ```bash
-# Claude Code
-mv fatestar-ziwei-skill ~/.claude/skills/ziwei-paipan
-
-# OpenAI Codex
-mv fatestar-ziwei-skill ~/.codex/skills/ziwei-paipan
-
 # OpenClaw
-mv fatestar-ziwei-skill ~/.openclaw/skills/ziwei-paipan
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git ~/.openclaw/skills/ziwei-paipan
 
 # Cursor / Windsurf project
-mv fatestar-ziwei-skill <project>/.skills/ziwei-paipan
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git <project>/.skills/ziwei-paipan
 
 # Shared by multiple tools
-mv fatestar-ziwei-skill ~/.agents/skills/ziwei-paipan
+git clone https://github.com/LouisLin0723/fatestar-ziwei-skill.git ~/.agents/skills/ziwei-paipan
 ```
 
 Restart the client after installation.
@@ -265,7 +256,7 @@ Remote MCP docs: <https://github.com/LouisLin0723/fatestar-ziwei-mcp>
 
 ### API Key
 
-`chart` and `transits` are free and anonymous. Only `reading` requires an `FSFSKey`.
+`chart` and `transits` are free and can be anonymous. With a configured key, they send it for account attribution but still consume no credits. Only `reading` requires an `FSFSKey`.
 
 ```bash
 cp .env.example .env
@@ -283,6 +274,8 @@ $env:FATESTAR_API_KEY="FSFSKey20260606XXXXXXXXXXXXXXXXXXXX"      # Windows Power
 
 Get a key at <https://www.fatestar.top>: sign up, claim starter credits, then create an `FSFSKey` in the developer center.
 
+Every CLI request sends `X-FateStar-Client: skill/2.1.0`. FateStar uses it to separate Skill, MCP, and API traffic; user identity still requires a server-verified key.
+
 ### Default Behavior
 
 For astrology questions about career, money, relationships, health, timing, or decisions, the Skill:
@@ -295,7 +288,7 @@ Priority:
 ```text
 Valid Key + credits → Zheng Da Qian reading
 No Key / insufficient credits → free chart data + agent model explanation
-Chart data only → chart / transits free anonymous calls
+Chart data only → chart / transits free calls (key optional)
 ```
 
 ### Verification

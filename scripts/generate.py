@@ -42,30 +42,34 @@ def load_constants():
 
 
 def render_constants(ext, c):
-    base, chart, reading = c["api_base"], c["chart_path"], c["reading_path"]
+    base, chart, reading, client = c["api_base"], c["chart_path"], c["reading_path"], c["client_id"]
     if ext == ".py":
         return (
             f'DEFAULT_API_BASE = "{base}"\n'
             f'CHART_PATH = "{chart}"\n'
-            f'READING_PATH = "{reading}"'
+            f'READING_PATH = "{reading}"\n'
+            f'CLIENT_ID = "{client}"'
         )
     if ext == ".js":
         return (
             f'const DEFAULT_API_BASE = "{base}";\n'
             f'const CHART_PATH = "{chart}";\n'
-            f'const READING_PATH = "{reading}";'
+            f'const READING_PATH = "{reading}";\n'
+            f'const CLIENT_ID = "{client}";'
         )
     if ext == ".ps1":
         return (
             f'$DEFAULT_API_BASE = "{base}"\n'
             f'$CHART_PATH = "{chart}"\n'
-            f'$READING_PATH = "{reading}"'
+            f'$READING_PATH = "{reading}"\n'
+            f'$CLIENT_ID = "{client}"'
         )
     if ext == ".sh":
         return (
             f'DEFAULT_API_BASE="{base}"\n'
             f'CHART_PATH="{chart}"\n'
-            f'READING_PATH="{reading}"'
+            f'READING_PATH="{reading}"\n'
+            f'CLIENT_ID="{client}"'
         )
     raise ValueError(f"Unsupported extension: {ext}")
 

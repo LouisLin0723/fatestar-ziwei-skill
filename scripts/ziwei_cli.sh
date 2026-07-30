@@ -36,6 +36,7 @@ load_env
 DEFAULT_API_BASE="https://www.fatestar.top"
 CHART_PATH="/api/ziwei"
 READING_PATH="/api/ziwei/reading"
+CLIENT_ID="skill/2.1.0"
 # END GENERATED:CONSTANTS
 
 api_base() {
@@ -87,7 +88,7 @@ RESP_BODY=""
 
 api_call() {
   # $1=method $2=url $3=body $4=apikey ; sets RESP_STATUS / RESP_BODY
-  local curl_args=(-s -m 40 -w $'\n%{http_code}' -H "Accept: application/json")
+  local curl_args=(-s -m 40 -w $'\n%{http_code}' -H "Accept: application/json" -H "X-FateStar-Client: $CLIENT_ID")
   [ -n "$4" ] && curl_args+=(-H "Authorization: Bearer $4")
   if [ "$1" = "POST" ]; then
     curl_args+=(-X POST -H "Content-Type: application/json" --data "$3")
@@ -116,18 +117,19 @@ err_from() {
 }
 
 cmd_chart() {
-  api_call GET "$(api_base)$CHART_PATH?$(build_birth_query)" "" ""
+  local key="${ARGS[api_key]:-${FATESTAR_API_KEY:-}}"
+  api_call GET "$(api_base)$CHART_PATH?$(build_birth_query)" "" "$key"
   if [ "$RESP_STATUS" != "200" ]; then err_from "$RESP_BODY" "$RESP_STATUS"; exit 1; fi
   printf '%s\n' "$RESP_BODY"
 }
 
 cmd_transits() {
-  local q; q="$(build_birth_query)&transits=1"
+  local q key; q="$(build_birth_query)&transits=1"; key="${ARGS[api_key]:-${FATESTAR_API_KEY:-}}"
   [ -n "${ARGS[target-year]:-}" ]  && q="$q&targetYear=${ARGS[target-year]}"
   [ -n "${ARGS[target-month]:-}" ] && q="$q&targetMonth=${ARGS[target-month]}"
   [ -n "${ARGS[target-day]:-}" ]   && q="$q&targetDay=${ARGS[target-day]}"
   [ -n "${ARGS[target-hour]:-}" ]  && q="$q&targetHour=${ARGS[target-hour]}"
-  api_call GET "$(api_base)$CHART_PATH?$q" "" ""
+  api_call GET "$(api_base)$CHART_PATH?$q" "" "$key"
   if [ "$RESP_STATUS" != "200" ]; then err_from "$RESP_BODY" "$RESP_STATUS"; exit 1; fi
   printf '%s\n' "$RESP_BODY"
 }

@@ -38,6 +38,7 @@ loadEnv();
 const DEFAULT_API_BASE = "https://www.fatestar.top";
 const CHART_PATH = "/api/ziwei";
 const READING_PATH = "/api/ziwei/reading";
+const CLIENT_ID = "skill/2.1.0";
 // END GENERATED:CONSTANTS
 
 function apiBase() {
@@ -69,7 +70,7 @@ function request(method, urlStr, opts) {
   return new Promise((resolve, reject) => {
     const u = new URL(urlStr);
     const lib = u.protocol === "http:" ? http : https;
-    const headers = { Accept: "application/json" };
+    const headers = { Accept: "application/json", "X-FateStar-Client": CLIENT_ID };
     let payload;
     if (opts.body) {
       payload = JSON.stringify(opts.body);
@@ -100,10 +101,14 @@ function errFrom(raw, status) {
   return 1;
 }
 
-async function getChart(query) {
+function resolveApiKey(args) {
+  return (args.api_key || process.env.FATESTAR_API_KEY || "").trim();
+}
+
+async function getChart(query, apiKey) {
   const url = apiBase() + CHART_PATH + "?" + new URLSearchParams(query).toString();
   try {
-    return await request("GET", url, {});
+    return await request("GET", url, { apiKey });
   } catch (e) {
     process.stderr.write(`Connection Error: unable to reach ${apiBase()} (${e.message})\n`);
     process.exit(1);
@@ -111,7 +116,7 @@ async function getChart(query) {
 }
 
 async function cmdChart(args) {
-  const { status, raw } = await getChart(buildBirthParams(args));
+  const { status, raw } = await getChart(buildBirthParams(args), resolveApiKey(args));
   if (status !== 200) process.exit(errFrom(raw, status));
   process.stdout.write(raw + "\n");
 }
@@ -123,7 +128,7 @@ async function cmdTransits(args) {
   if (args["target-month"] !== undefined) query.targetMonth = args["target-month"];
   if (args["target-day"] !== undefined) query.targetDay = args["target-day"];
   if (args["target-hour"] !== undefined) query.targetHour = args["target-hour"];
-  const { status, raw } = await getChart(query);
+  const { status, raw } = await getChart(query, resolveApiKey(args));
   if (status !== 200) process.exit(errFrom(raw, status));
   process.stdout.write(raw + "\n");
 }
@@ -134,7 +139,7 @@ async function cmdReading(args) {
     process.stderr.write("Error: --question is required for reading.\n");
     process.exit(1);
   }
-  const apiKey = (args.api_key || process.env.FATESTAR_API_KEY || "").trim();
+  const apiKey = resolveApiKey(args);
   if (!apiKey) {
     process.stderr.write(
       "郑大钱解读需要 FSFSKey（尚未配置）。\n" +

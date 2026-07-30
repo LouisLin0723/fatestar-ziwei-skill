@@ -10,6 +10,8 @@
 - `doc` 离线接口规范渲染
 - 错误处理（坏参数 / 未知命令）
 - 中文输出无乱码（尤其 PowerShell 5.1，需 UTF-8 BOM）
+- 每个网络请求都带 `X-FateStar-Client: skill/2.1.0`
+- 配置 Key 后，免费 chart/transits 也带 Authorization，但仍不扣积分
 
 ## 前置条件
 
@@ -59,6 +61,8 @@
 |---|---|---|
 | 15 | 同一 chart 命令在 py / js / ps1 / sh 各跑一次 | 四者都返回同一命盘（同一 `data`） |
 | 16 | PowerShell 5.1 跑 doc / chart | 中文无乱码（验证 `.ps1` 的 UTF-8 BOM 生效） |
+| 17 | 用本地 mock API 跑 py / js / ps1 / sh 的 chart | 四者都发送 `X-FateStar-Client: skill/2.1.0` |
+| 18 | 配置测试 Key后跑免费 chart | 请求带 Authorization；响应仍走免费 chart，不触发 reading |
 
 ---
 

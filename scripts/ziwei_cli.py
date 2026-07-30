@@ -54,6 +54,7 @@ _load_env()
 DEFAULT_API_BASE = "https://www.fatestar.top"
 CHART_PATH = "/api/ziwei"
 READING_PATH = "/api/ziwei/reading"
+CLIENT_ID = "skill/2.1.0"
 # END GENERATED:CONSTANTS
 
 
@@ -95,15 +96,26 @@ def _err_from(raw: str, status: int) -> int:
     return 1
 
 
-def _get(path: str, query: dict):
+def _resolve_api_key(args) -> str:
+    return (getattr(args, "api_key", "") or os.environ.get("FATESTAR_API_KEY", "")).strip()
+
+
+def _get(path: str, query: dict, api_key: str = ""):
     url = _api_base() + path + "?" + urllib.parse.urlencode(query)
-    req = urllib.request.Request(url, headers={"Accept": "application/json"}, method="GET")
+    headers = {"Accept": "application/json", "X-FateStar-Client": CLIENT_ID}
+    if api_key:
+        headers["Authorization"] = f"Bearer {api_key}"
+    req = urllib.request.Request(url, headers=headers, method="GET")
     return _send(req)
 
 
 def _post(path: str, body: dict, api_key: str = ""):
     data = json.dumps(body).encode("utf-8")
-    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "X-FateStar-Client": CLIENT_ID,
+    }
     if api_key:
         headers["Authorization"] = f"Bearer {api_key}"
     req = urllib.request.Request(_api_base() + path, data=data, headers=headers, method="POST")
@@ -127,7 +139,7 @@ def _send(req):
 
 def cmd_chart(args):
     """Free natal chart."""
-    status, raw = _get(CHART_PATH, _build_birth_params(args))
+    status, raw = _get(CHART_PATH, _build_birth_params(args), _resolve_api_key(args))
     if status != 200:
         sys.exit(_err_from(raw, status))
     print(raw)
@@ -145,7 +157,7 @@ def cmd_transits(args):
         query["targetDay"] = args.target_day
     if args.target_hour is not None:
         query["targetHour"] = args.target_hour
-    status, raw = _get(CHART_PATH, query)
+    status, raw = _get(CHART_PATH, query, _resolve_api_key(args))
     if status != 200:
         sys.exit(_err_from(raw, status))
     print(raw)
@@ -158,7 +170,7 @@ def cmd_reading(args):
         print("Error: --question is required for reading.", file=sys.stderr)
         sys.exit(1)
 
-    api_key = (args.api_key or os.environ.get("FATESTAR_API_KEY", "")).strip()
+    api_key = _resolve_api_key(args)
     if not api_key:
         print(
             "郑大钱解读需要 FSFSKey（尚未配置）。\n"
@@ -234,6 +246,7 @@ def _add_birth_args(p, with_targets=False, with_question=False):
     p.add_argument("--leap", action="store_true", help="Leap month (only with --calendar lunar)")
     p.add_argument("--longitude", type=float, default=None, help="Birth longitude (E +, W -); enables true-solar-time")
     p.add_argument("--tz", type=float, default=None, help="Timezone offset (UTC+8 = 8); use with --longitude")
+    p.add_argument("--api_key", default="", help="Optional FSFSKey (identifies free calls; required for reading)")
     if with_targets:
         p.add_argument("--target-year", type=int, default=None, help="Annual target solar year (default: current year)")
         p.add_argument("--target-month", type=int, default=None, help="Monthly target lunar month 1-12")
@@ -241,7 +254,6 @@ def _add_birth_args(p, with_targets=False, with_question=False):
         p.add_argument("--target-hour", type=int, default=None, help="Hourly target hour 0-23")
     if with_question:
         p.add_argument("--question", help="The question for 郑大钱 (e.g. 看我今年事业运,该不该跳槽?)")
-        p.add_argument("--api_key", default="", help="FSFSKey (else .env / env FATESTAR_API_KEY)")
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -34,12 +34,19 @@ Load-Env
 $DEFAULT_API_BASE = "https://www.fatestar.top"
 $CHART_PATH = "/api/ziwei"
 $READING_PATH = "/api/ziwei/reading"
+$CLIENT_ID = "skill/2.1.0"
 # END GENERATED:CONSTANTS
 
 function Get-ApiBase {
     $b = $env:FATESTAR_API_BASE
     if (-not $b) { $b = $DEFAULT_API_BASE }
     return $b.TrimEnd("/")
+}
+
+function Get-ApiKey($a) {
+    $key = $a["api_key"]
+    if (-not $key) { $key = $env:FATESTAR_API_KEY }
+    return ([string]$key).Trim()
 }
 
 function Build-BirthParams($a) {
@@ -66,6 +73,7 @@ function Invoke-Api {
     $req = [System.Net.HttpWebRequest]::Create($Url)
     $req.Method = $Method
     $req.Accept = "application/json"
+    $req.Headers.Add("X-FateStar-Client", $CLIENT_ID)
     $req.Timeout = 40000
     if ($ApiKey) { $req.Headers.Add("Authorization", "Bearer $ApiKey") }
     if ($Method -eq "POST") {
@@ -95,7 +103,7 @@ function Err-From($raw, $status) {
 
 function Cmd-Chart($a) {
     $url = (Get-ApiBase) + $CHART_PATH + "?" + (To-QueryString (Build-BirthParams $a))
-    $r = Invoke-Api "GET" $url $null $null
+    $r = Invoke-Api "GET" $url $null (Get-ApiKey $a)
     if ($r.status -ne 200) { Err-From $r.raw $r.status; exit 1 }
     Write-Output $r.raw
 }
@@ -108,7 +116,7 @@ function Cmd-Transits($a) {
     if ($a.Contains("target-day")) { $q["targetDay"] = $a["target-day"] }
     if ($a.Contains("target-hour")) { $q["targetHour"] = $a["target-hour"] }
     $url = (Get-ApiBase) + $CHART_PATH + "?" + (To-QueryString $q)
-    $r = Invoke-Api "GET" $url $null $null
+    $r = Invoke-Api "GET" $url $null (Get-ApiKey $a)
     if ($r.status -ne 200) { Err-From $r.raw $r.status; exit 1 }
     Write-Output $r.raw
 }
@@ -116,8 +124,7 @@ function Cmd-Transits($a) {
 function Cmd-Reading($a) {
     $question = ([string]$a["question"]).Trim()
     if (-not $question) { [Console]::Error.WriteLine("Error: --question is required for reading."); exit 1 }
-    $apiKey = $a["api_key"]
-    if (-not $apiKey) { $apiKey = $env:FATESTAR_API_KEY }
+    $apiKey = Get-ApiKey $a
     if (-not $apiKey) {
         [Console]::Error.WriteLine("郑大钱解读需要 FSFSKey（尚未配置）。")
         [Console]::Error.WriteLine("请到 https://www.fatestar.top 注册免费会员 → 做新手任务领积分 →")

@@ -1,14 +1,15 @@
 # FateStar Ziwei 接口规范（给 AI Agent 读）
 
 紫微斗数（Zi Wei Dou Shu / Purple Star Astrology）排盘 + AI 解读，引擎由 FateStar 自研
-（102 颗星 · 三合派四化 · 真太阳时）。**排盘免费、匿名**；**郑大钱（Zheng Da Qian）解读**
+（102 颗星 · 三合派四化 · 真太阳时）。**排盘免费、可匿名**；**郑大钱（Zheng Da Qian）解读**
 付费（扣积分，需 `FSFSKey`）。
 
 ## 协议
 
 - 排盘（免费）：GET / POST  https://www.fatestar.top/api/ziwei
 - 解读（付费）：POST        https://www.fatestar.top/api/ziwei/reading
-- 认证：排盘匿名（按 IP 限流）；解读需 `Authorization: Bearer FSFSKey...`。
+- 渠道标记：所有 CLI 请求发送 `X-FateStar-Client: skill/2.1.0`。
+- 认证：排盘可匿名；配置 Key 时免费请求也携带 Key做用户归属，但不扣积分。解读必须带 Key。
 
 ## CLI 调用方式 ({{LANG_NAME}})
 
@@ -33,6 +34,7 @@
 | --leap | flag | 否 | 闰月（仅 --calendar lunar 有效） |
 | --longitude | float | 否 | 出生地经度（东经正、西经负），启用真太阳时修正 |
 | --tz | float | 否 | 时区偏移（UTC+8 = 8），配合 --longitude |
+| --api_key | string | 否 | 可选 FSFSKey；免费排盘仅用于用户归属，不触发扣费 |
 
 ### 2. transits — 6 层运限（免费）
 本命盘 + 6 层运限：大限 / 小限 / 流年 / 流月 / 流日 / 流时。共享上面所有出生参数，外加下面
@@ -53,7 +55,7 @@ FateStar 解读路径：知识引擎 + 郑大钱人格。**用户问命理问题
 |------|------|------|------|
 | (chart 的全部出生参数) | | 是 | year/month/day/hour/gender 必填 |
 | --question | string | 是 | 要问郑大钱的问题（如「看我今年事业运，该不该跳槽？」） |
-| --api_key | string | 否 | FSFSKey（否则取 .env / 环境变量 FATESTAR_API_KEY）。未提供 Key → 引导注册 |
+| --api_key | string | 否 | FSFSKey（否则取 .env / 环境变量 FATESTAR_API_KEY）。reading 未提供 Key → 引导注册 |
 
 计费：中文 ≤10 字、日文/韩文 ≤15 字、英文及其他外语 ≤30 字符为短问，不扣积分。超过免费门槛后起扣 1 积分；长问封顶 2 积分（中文 >100 / 日文韩文 >150 / 英文及其他外语 >300）。
 免费会员每天 3 积分（北京时间 21:00 重置）。
@@ -130,5 +132,6 @@ FateStar 解读路径：知识引擎 + 郑大钱人格。**用户问命理问题
 ## 安全 & 隐私
 
 - `doc` 命令纯本地，不发任何网络请求。
-- 排盘只把出生信息发往 https://www.fatestar.top —— 无需账号。
+- 排盘只把出生信息发往 https://www.fatestar.top；如已配置 Key，会一并发送做用户归属，但接口仍免费。
+- 所有网络请求标记 `skill/2.1.0`，用于后台区分 API / MCP / Skill。
 - 解读额外发送你的 FSFSKey + 问题。Key 当密码对待：存 `.env` 或环境变量，别贴聊天框。
