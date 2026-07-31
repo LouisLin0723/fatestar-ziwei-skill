@@ -1,21 +1,31 @@
 # FateStar Ziwei
 
-Zi Wei Dou Shu (Purple Star Astrology) for AI agents. Install one Agent Skill, connect one hosted MCP endpoint, or call the free REST API.
+Free hosted Zi Wei Dou Shu (Purple Star Astrology) charting for AI agents. Use it as an Agent Skill, a remote MCP server, or a REST API.
 
 [简体中文](./README.zh-CN.md)
 
 [![Validate](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/validate.yml/badge.svg)](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/validate.yml)
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-listed-8b5cf6)](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.LouisLin0723%2Ffatestar-ziwei)
 [![Release](https://img.shields.io/github/v/release/LouisLin0723/fatestar-ziwei)](https://github.com/LouisLin0723/fatestar-ziwei/releases)
 [![Stars](https://img.shields.io/github/stars/LouisLin0723/fatestar-ziwei?style=flat)](https://github.com/LouisLin0723/fatestar-ziwei/stargazers)
 [![License](https://img.shields.io/github/license/LouisLin0723/fatestar-ziwei)](./LICENSE)
 
-Charting and six-level transits are free and can be used anonymously. The optional Zheng Da Qian reading uses a FateStar API key and credits.
+![FateStar Ziwei Agent Skill, hosted MCP, and REST API preview](./assets/fatestar-ziwei-social-preview.png)
 
-If this project saves you setup time, [star the repository](https://github.com/LouisLin0723/fatestar-ziwei). It helps other agent users find it.
+Natal charts and six-level transits work anonymously. The optional Zheng Da Qian reading uses a FateStar API key and credits.
 
-## See it work
+## Try it now
 
-After installing the Skill, tell your agent:
+[Open a live anonymous chart response](https://www.fatestar.top/api/ziwei?year=1990&month=7&day=23&hour=8&gender=male). No account or API key is required. Selected fields from that response:
+
+```text
+Solar 1990-7-23 | Lunar 一九九〇年六月初二
+Five-elements class 土五局 | Life ruler 文曲 | Body ruler 火星
+Life palace 己卯 | 廉贞 (平), 破军 (陷)
+12 palaces | 5 detected patterns | 4 natal transformations
+```
+
+After installing the Skill or connecting the MCP endpoint, tell your agent:
 
 > Create a Zi Wei Dou Shu chart for a man born on July 23, 1990 at 8:00 AM, then show his 2026 transits.
 
@@ -25,6 +35,8 @@ The agent calls FateStar and returns:
 - true-solar-time correction when longitude and timezone are supplied;
 - decade, annual, monthly, daily, and hourly transits;
 - an optional Zheng Da Qian reading when a valid key and credits are available.
+
+If the live result is useful, [star the repository](https://github.com/LouisLin0723/fatestar-ziwei). It helps other agent developers find the free endpoint.
 
 ## Quick start
 
@@ -62,6 +74,8 @@ No local server is required. Add the remote endpoint to a client that supports S
 ```
 
 The endpoint exposes `ziwei_chart`, `ziwei_transits`, and `ziwei_reading`. The first two tools are free and anonymous.
+
+The server is listed in the official MCP Registry as [`io.github.LouisLin0723/fatestar-ziwei`](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.LouisLin0723%2Ffatestar-ziwei).
 
 ### REST API
 

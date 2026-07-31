@@ -1,21 +1,31 @@
 # FateStar 紫微斗数
 
-给 AI Agent 用的紫微斗数接入仓库。安装一个 Skill、连接一个远程 MCP，或直接调用免费 REST API。
+给 AI Agent 用的免费托管紫微斗数排盘。可以安装 Agent Skill、连接远程 MCP，或直接调用 REST API。
 
 [English](./README.md)
 
 [![验证](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/validate.yml/badge.svg)](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/validate.yml)
+[![MCP Registry](https://img.shields.io/badge/MCP_Registry-listed-8b5cf6)](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.LouisLin0723%2Ffatestar-ziwei)
 [![版本](https://img.shields.io/github/v/release/LouisLin0723/fatestar-ziwei)](https://github.com/LouisLin0723/fatestar-ziwei/releases)
 [![Stars](https://img.shields.io/github/stars/LouisLin0723/fatestar-ziwei?style=flat)](https://github.com/LouisLin0723/fatestar-ziwei/stargazers)
 [![许可证](https://img.shields.io/github/license/LouisLin0723/fatestar-ziwei)](./LICENSE)
 
+![FateStar 紫微斗数 Agent Skill、远程 MCP 与 REST API 预览](./assets/fatestar-ziwei-social-preview.png)
+
 本命盘与六层运限免费、支持匿名调用。「郑大钱」解读需要 FateStar API Key，并按积分规则计费。
 
-如果这个项目帮你省下了接入时间，欢迎[点一个 Star](https://github.com/LouisLin0723/fatestar-ziwei)，让更多 Agent 用户找到它。
+## 立即体验
 
-## 实际怎么用
+[打开一份实时匿名命盘结果](https://www.fatestar.top/api/ziwei?year=1990&month=7&day=23&hour=8&gender=male)，无需注册或 API Key。下面是这份结果中的部分字段：
 
-装好 Skill 后，直接对 Agent 说：
+```text
+阳历 1990-7-23 | 农历 一九九〇年六月初二
+五行局 土五局 | 命主 文曲 | 身主 火星
+命宫 己卯 | 廉贞（平）、破军（陷）
+十二宫 12 个 | 检出格局 5 个 | 本命四化 4 个
+```
+
+装好 Skill 或连上 MCP 后，直接对 Agent 说：
 
 > 帮我排 1990 年 7 月 23 日早上 8 点出生男性的紫微盘，再看 2026 年运限。
 
@@ -25,6 +35,8 @@ Agent 会调用 FateStar，并返回：
 - 传入经度与时区后的真太阳时修正；
 - 大限、小限、流年、流月、流日、流时；
 - 配置有效 Key 且积分足够时，可选用「郑大钱」解读。
+
+如果现场结果对你有用，欢迎[点一个 Star](https://github.com/LouisLin0723/fatestar-ziwei)，让更多 Agent 开发者找到这个免费端点。
 
 ## 快速开始
 
@@ -62,6 +74,8 @@ gh skill install LouisLin0723/fatestar-ziwei ziwei-paipan --agent cursor --scope
 ```
 
 端点提供 `ziwei_chart`、`ziwei_transits`、`ziwei_reading`。前两个工具免费且可匿名使用。
+
+该服务已在官方 MCP Registry 登记为 [`io.github.LouisLin0723/fatestar-ziwei`](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.LouisLin0723%2Ffatestar-ziwei)。
 
 ### REST API
 
