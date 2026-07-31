@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.louislin0723/fatestar-ziwei",
+  "name": "io.github.LouisLin0723/fatestar-ziwei",
   "title": "FateStar Ziwei",
   "description": "Zi Wei Dou Shu for AI agents: free natal charts, six transit levels, and optional readings.",
   "version": "2.0.0",
