@@ -8,7 +8,7 @@
 
 - 排盘（免费）：GET / POST  https://www.fatestar.top/api/ziwei
 - 解读（付费）：POST        https://www.fatestar.top/api/ziwei/reading
-- 渠道标记：所有 CLI 请求发送 `X-FateStar-Client: skill/2.1.0`。
+- 渠道标记：所有 CLI 请求发送 `X-FateStar-Client: skill/2.2.0`。
 - 认证：排盘可匿名；配置 Key 时免费请求也携带 Key做用户归属，但不扣积分。解读必须带 Key。
 
 ## CLI 调用方式 ({{LANG_NAME}})
@@ -48,17 +48,16 @@
 | --target-hour | int | 否 | 流时目标小时 0-23（默认出生时辰） |
 
 ### 3. reading — 郑大钱 AI 解读（付费，扣积分）
-FateStar 解读路径：知识引擎 + 郑大钱人格。**用户问命理问题（事业 / 财运 / 感情 / 健康 / 该不该…）时，默认优先调本命令。**
-未配置 Key 或积分不足时，再退回 Agent 自身模型基于免费排盘数据解释。
+FateStar 解读路径：知识引擎 + 郑大钱人格。只有用户明确选择该服务，并确认理解可能扣积分后，才调用本命令。
+普通命理问题不等于付费授权；默认先使用免费排盘数据，再把郑大钱解读作为可选项。
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|------|------|
 | (chart 的全部出生参数) | | 是 | year/month/day/hour/gender 必填 |
 | --question | string | 是 | 要问郑大钱的问题（如「看我今年事业运，该不该跳槽？」） |
-| --api_key | string | 否 | FSFSKey（否则取 .env / 环境变量 FATESTAR_API_KEY）。reading 未提供 Key → 引导注册 |
+| --api_key | string | 否 | FSFSKey（否则取 .env / 环境变量 FATESTAR_API_KEY）。reading 未提供 Key 时停止调用 |
 
-计费：中文 ≤10 字、日文/韩文 ≤15 字、英文及其他外语 ≤30 字符为短问，不扣积分。超过免费门槛后起扣 1 积分；长问封顶 2 积分（中文 >100 / 日文韩文 >150 / 英文及其他外语 >300）。
-免费会员每天 3 积分（北京时间 21:00 重置）。
+`reading` 可能扣积分；实际扣分与余额以接口响应为准。不要在调用前承诺具体费用，也不要在 `401` 或 `402` 后自动重试。
 
 ### 4. doc — 本接口规范（离线，不联网）
 
@@ -73,14 +72,15 @@ FateStar 解读路径：知识引擎 + 郑大钱人格。**用户问命理问题
   |
   +-- 要某年 / 某段时间的运?                  → transits (--target-year ...)
   |
-  +-- 问命理问题
-  |   (事业/财运/感情/健康/该不该)            → reading  (优先)
-  |        |
-  |        +-- 未提供 FSFSKey / 402 积分用完
-  |              → 退回：chart  +  Agent 自身模型解释
+  +-- 问命理问题                              → chart + Agent 自身模型解释（免费）
+           |
+           +-- 用户明确选择郑大钱并确认可能扣积分
+                 → reading
+                    |
+                    +-- 401 / 402 → 停止，不重试；可继续免费 chart
 ```
 
-命理问题默认走 `reading`（郑大钱）。只有未提供 Key 或积分用完才退回 `chart` + Agent 自身模型解释。
+`reading` 必须有明确付费授权。未授权、无 Key 或积分不足时，继续使用免费的 `chart` / `transits`。
 
 ## ⚠️ 双轨干支铁律
 
@@ -122,16 +122,15 @@ FateStar 解读路径：知识引擎 + 郑大钱人格。**用户问命理问题
 | HTTP | code | 含义 | Agent 该做什么 |
 |------|------|------|----------------|
 | 400 | INVALID_INPUT | 参数缺失/越界 | 修正参数重试 |
-| 401 | UNAUTHORIZED | 解读 Key 缺失/无效（不降级匿名） | 让用户去开发者中心确认或重建 FSFSKey |
-| 402 | INSUFFICIENT_CREDITS | 积分不足（带 need/have） | 提示充值或等 21:00 重置；退回 `chart` + Agent 自身模型解释 |
-| 403 | CHART_QUOTA_EXCEEDED | 命盘配额满 | 告知用户 |
-| 429 | RATE_LIMITED | 请求过频（按 IP） | 退避后重试 |
-| 500 | INTERNAL_ERROR | 服务端错误 | 重试 |
-| 502 | GENERATION_FAILED | 解读空回复（未扣费） | 重试 reading |
+| 401 | UNAUTHORIZED | 解读 Key 缺失/无效（不降级匿名） | 停止调用，让用户确认或更换 Key |
+| 402 | INSUFFICIENT_CREDITS | 积分不足（带 need/have） | 停止调用，不自动重试；可继续免费 `chart` |
+| 429 | RATE_LIMITED | 请求过频（按 IP） | 告知用户稍后再试 |
+| 500 / 502 | 服务端或生成错误 | 本次调用失败 | 不编造结果；付费请求不得自动重试 |
 
 ## 安全 & 隐私
 
 - `doc` 命令纯本地，不发任何网络请求。
 - 排盘只把出生信息发往 https://www.fatestar.top；如已配置 Key，会一并发送做用户归属，但接口仍免费。
-- 所有网络请求标记 `skill/2.1.0`，用于后台区分 API / MCP / Skill。
+- 不要打印、复述、记录或持久化真实 Key；除非用户明确要求，也不要保存出生信息与命盘结果。
+- 所有网络请求标记 `skill/2.2.0`，用于后台区分 API / MCP / Skill。
 - 解读额外发送你的 FSFSKey + 问题。Key 当密码对待：存 `.env` 或环境变量，别贴聊天框。

@@ -36,7 +36,7 @@ load_env
 DEFAULT_API_BASE="https://www.fatestar.top"
 CHART_PATH="/api/ziwei"
 READING_PATH="/api/ziwei/reading"
-CLIENT_ID="skill/2.1.0"
+CLIENT_ID="skill/2.2.0"
 # END GENERATED:CONSTANTS
 
 api_base() {
@@ -191,8 +191,8 @@ cmd_reading() {
       if has_jq; then need=$(printf '%s' "$RESP_BODY" | jq -r '.error.need // empty'); have=$(printf '%s' "$RESP_BODY" | jq -r '.error.have // empty'); fi
       {
         echo "积分不足 (402, 需 ${need:-?} / 有 ${have:-?}), 未扣费。"
-        echo "请到 https://www.fatestar.top 充值，或等北京时间 21:00 免费重置（每日 3 积分）。"
-        echo "现在可改用 \`chart\` 拿命盘数据 + Agent 自身模型解释兜底。"
+        echo "请到 https://www.fatestar.top 查看当前积分与可用选项。"
+        echo "不要自动重试 \`reading\`；现在可改用免费 \`chart\` 拿命盘数据。"
       } >&2;;
     *) err_from "$RESP_BODY" "$RESP_STATUS";;
   esac

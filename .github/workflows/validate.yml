@@ -1,0 +1,43 @@
+name: Validate
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable-clients:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Verify generated clients
+        run: python skills/ziwei-paipan/scripts/generate.py --check
+      - name: Exercise offline documentation
+        shell: bash
+        run: |
+          set -euo pipefail
+          skill_dir="skills/ziwei-paipan"
+          python "$skill_dir/scripts/ziwei_cli.py" doc | grep -q "FateStar Ziwei"
+          node "$skill_dir/scripts/ziwei_cli.js" doc | grep -q "FateStar Ziwei"
+          bash "$skill_dir/scripts/ziwei_cli.sh" doc | grep -q "FateStar Ziwei"
+          python -m json.tool server.json > /dev/null
+
+  windows-powershell:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Exercise Windows PowerShell client
+        shell: powershell
+        run: |
+          $output = & powershell -NoProfile -ExecutionPolicy Bypass -File "skills/ziwei-paipan/scripts/ziwei_cli.ps1" doc
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (($output -join "`n") -notmatch "FateStar Ziwei") { throw "Offline documentation header missing" }

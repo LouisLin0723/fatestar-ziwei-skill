@@ -38,7 +38,7 @@ loadEnv();
 const DEFAULT_API_BASE = "https://www.fatestar.top";
 const CHART_PATH = "/api/ziwei";
 const READING_PATH = "/api/ziwei/reading";
-const CLIENT_ID = "skill/2.1.0";
+const CLIENT_ID = "skill/2.2.0";
 // END GENERATED:CONSTANTS
 
 function apiBase() {
@@ -178,8 +178,8 @@ async function cmdReading(args) {
   } else if (status === 402) {
     process.stderr.write(
       `积分不足 (402, 需 ${err.need} / 有 ${err.have}), 未扣费。\n` +
-      "请到 https://www.fatestar.top 充值，或等北京时间 21:00 免费重置（每日 3 积分）。\n" +
-      "现在可改用 `chart` 拿命盘数据 + Agent 自身模型解释兜底。\n"
+      "请到 https://www.fatestar.top 查看当前积分与可用选项。\n" +
+      "不要自动重试 `reading`；现在可改用免费 `chart` 拿命盘数据。\n"
     );
   } else {
     errFrom(raw, status);

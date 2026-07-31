@@ -34,7 +34,7 @@ Load-Env
 $DEFAULT_API_BASE = "https://www.fatestar.top"
 $CHART_PATH = "/api/ziwei"
 $READING_PATH = "/api/ziwei/reading"
-$CLIENT_ID = "skill/2.1.0"
+$CLIENT_ID = "skill/2.2.0"
 # END GENERATED:CONSTANTS
 
 function Get-ApiBase {
@@ -150,8 +150,8 @@ function Cmd-Reading($a) {
         $need = $null; $have = $null
         try { $e = ($r.raw | ConvertFrom-Json).error; $need = $e.need; $have = $e.have } catch {}
         [Console]::Error.WriteLine("积分不足 (402, 需 $need / 有 $have), 未扣费。")
-        [Console]::Error.WriteLine("请到 https://www.fatestar.top 充值，或等北京时间 21:00 免费重置（每日 3 积分）。")
-        [Console]::Error.WriteLine("现在可改用 ``chart`` 拿命盘数据 + Agent 自身模型解释兜底。")
+        [Console]::Error.WriteLine("请到 https://www.fatestar.top 查看当前积分与可用选项。")
+        [Console]::Error.WriteLine("不要自动重试 ``reading``；现在可改用免费 ``chart`` 拿命盘数据。")
     } else {
         Err-From $r.raw $r.status
     }

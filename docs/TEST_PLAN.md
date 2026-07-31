@@ -10,13 +10,13 @@
 - `doc` 离线接口规范渲染
 - 错误处理（坏参数 / 未知命令）
 - 中文输出无乱码（尤其 PowerShell 5.1，需 UTF-8 BOM）
-- 每个网络请求都带 `X-FateStar-Client: skill/2.1.0`
+- 每个网络请求都带 `X-FateStar-Client: skill/2.2.0`
 - 配置 Key 后，免费 chart/transits 也带 Authorization，但仍不扣积分
 
 ## 前置条件
 
 1. 已探测可用 runtime，或 `runtime.conf` 就位（优先级 Python > Node.js > Shell）
-2. 测 `reading` 真实解读需 `.env` 里有有效 `FSFSKey`（没有则只测未配置 Key 引导路径）
+2. 真实 `reading` 测试必须先取得操作者明确批准并确认测试积分预算，再使用 `.env` 中的有效 `FSFSKey`；否则只测未配置 Key 的停止路径
 3. `generate.py --check` 应 exit 0（4 个 CLI 的公共块一致）
 
 ---
@@ -43,7 +43,7 @@
 |---|---|---|
 | 7 | `reading … --question "今年事业运？"`，**未配置 Key** | stderr 输出注册引导，exit code = 2 |
 | 8 | reading 缺 `--question` | stderr「--question is required」，exit 1 |
-| 9 | reading 有有效 Key + 有积分（需真 Key） | stdout 输出郑大钱解读全文；stderr 报扣除/剩余积分 |
+| 9 | 经明确批准后，reading 使用有效 Key + 测试积分 | stdout 输出郑大钱解读全文；stderr 报实际扣除/剩余积分 |
 | 10 | reading Key 无效（乱填 FSFSKeyxxx） | 401 提示去开发者中心，exit 1 |
 
 ## 第四组：doc + 错误处理
@@ -61,17 +61,18 @@
 |---|---|---|
 | 15 | 同一 chart 命令在 py / js / ps1 / sh 各跑一次 | 四者都返回同一命盘（同一 `data`） |
 | 16 | PowerShell 5.1 跑 doc / chart | 中文无乱码（验证 `.ps1` 的 UTF-8 BOM 生效） |
-| 17 | 用本地 mock API 跑 py / js / ps1 / sh 的 chart | 四者都发送 `X-FateStar-Client: skill/2.1.0` |
+| 17 | 用本地 mock API 跑 py / js / ps1 / sh 的 chart | 四者都发送 `X-FateStar-Client: skill/2.2.0` |
 | 18 | 配置测试 Key后跑免费 chart | 请求带 Authorization；响应仍走免费 chart，不触发 reading |
 
 ---
 
 ## 通过标准
 
-- 第 1-6、11、15、16 组输出符合预期，中文无乱码
-- 第 7、12、13、14 组 exit code 与提示正确（未配置 Key 引导 / 报错路径）
+- 第 1-6、11、15、16 项输出符合预期，中文无乱码
+- 第 7、12、13、14 项 exit code 与提示正确（未配置 Key / 报错路径）
+- 第 9 项只有在已批准真实付费测试时才是必测项
 - `generate.py --check` exit 0
-- 偶发 `Connection Error` / `Timeout` 不算失败（网络抖动），重试即可
+- 偶发 `Connection Error` / `Timeout` 需记录；免费调用可重试一次，付费 `reading` 不得自动重试
 
 ## 执行方式
 

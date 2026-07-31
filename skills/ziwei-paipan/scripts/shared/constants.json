@@ -2,7 +2,7 @@
   "api_base": "https://www.fatestar.top",
   "chart_path": "/api/ziwei",
   "reading_path": "/api/ziwei/reading",
-  "client_id": "skill/2.1.0",
+  "client_id": "skill/2.2.0",
   "mcp_url": "https://www.fatestar.top/api/mcp",
   "npm_package": "@fatestar/ziwei-mcp",
   "genders": ["male", "female"],

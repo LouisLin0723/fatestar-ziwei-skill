@@ -1,0 +1,4 @@
+interface:
+  display_name: "FateStar 紫微排盘"
+  short_description: "免费紫微排盘、六层运限与真太阳时，可选付费郑大钱解读"
+  default_prompt: "使用 $ziwei-paipan 免费排紫微命盘或查看运限；如需付费解读，请先向我确认。"
