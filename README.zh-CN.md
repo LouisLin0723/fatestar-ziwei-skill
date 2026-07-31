@@ -1,10 +1,11 @@
 # FateStar 紫微斗数
 
-给 AI Agent 用的免费托管紫微斗数排盘。可以安装 Agent Skill、连接远程 MCP，或直接调用 REST API。
+一个专注紫微斗数的托管 MCP：只配一个 URL；免费本命盘与六层运限无需本地服务、安装包、账号或 API Key。也提供 Agent Skill 与 REST API。
 
 [English](./README.md)
 
 [![验证](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/validate.yml/badge.svg)](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/validate.yml)
+[![线上合约](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/live-contract.yml/badge.svg)](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/live-contract.yml)
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-listed-8b5cf6)](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.LouisLin0723%2Ffatestar-ziwei)
 [![版本](https://img.shields.io/github/v/release/LouisLin0723/fatestar-ziwei)](https://github.com/LouisLin0723/fatestar-ziwei/releases)
 [![Stars](https://img.shields.io/github/stars/LouisLin0723/fatestar-ziwei?style=flat)](https://github.com/LouisLin0723/fatestar-ziwei/stargazers)
@@ -37,6 +38,18 @@ Agent 会调用 FateStar，并返回：
 - 配置有效 Key 且积分足够时，可选用「郑大钱」解读。
 
 如果现场结果对你有用，欢迎[点一个 Star](https://github.com/LouisLin0723/fatestar-ziwei)，让更多 Agent 开发者找到这个免费端点。
+
+## 为什么选 FateStar
+
+FateStar 刻意做窄：让 AI Agent 不用维护本地命理服务，也能直接取得紫微命盘数据。
+
+| 选择 | 更适合的情况 |
+| --- | --- |
+| **FateStar** | 现在就要托管远程 MCP：一个 URL、匿名免费排盘、六层运限、原生结构化 MCP 输出，并已进入官方 Registry。 |
+| [Iztro](https://github.com/SylarLong/iztro) | 需要把开源紫微引擎嵌入自己的程序，并检查或修改底层实现。 |
+| [Taibu](https://github.com/hhszzzz/taibu) 或 [Horosa Skill](https://github.com/Horace-Maxwell/horosa-skill) | 更重视多术数覆盖或离线工具，而不是专注紫微的托管端点。 |
+
+这是部署方式与产品范围的差异，不代表某个流派或引擎在所有情况都更准确。
 
 ## 快速开始
 
@@ -74,6 +87,8 @@ gh skill install LouisLin0723/fatestar-ziwei ziwei-paipan --agent cursor --scope
 ```
 
 端点提供 `ziwei_chart`、`ziwei_transits`、`ziwei_reading`。前两个工具免费且可匿名使用。
+
+`tools/list` 会为每个工具声明 `outputSchema` 与行为 annotations。成功调用同时返回原生 `structuredContent` 和旧版 JSON 文本：新 Agent 可直接读取结构化字段，旧客户端仍然兼容。
 
 该服务已在官方 MCP Registry 登记为 [`io.github.LouisLin0723/fatestar-ziwei`](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.LouisLin0723%2Ffatestar-ziwei)。
 
@@ -162,6 +177,7 @@ skills/ziwei-paipan/
 
 ```bash
 python skills/ziwei-paipan/scripts/generate.py --check
+python tests/live_contract_check.py
 python skills/ziwei-paipan/scripts/ziwei_cli.py doc
 node skills/ziwei-paipan/scripts/ziwei_cli.js doc
 powershell -ExecutionPolicy Bypass -File skills/ziwei-paipan/scripts/ziwei_cli.ps1 doc
@@ -169,7 +185,7 @@ bash skills/ziwei-paipan/scripts/ziwei_cli.sh doc
 ```
 
 四套客户端共用生成常量与离线接口规范。修改共享文件后先执行 `generate.py`，再运行上述检查。
-完整兼容性测试矩阵见 [`docs/TEST_PLAN.md`](./docs/TEST_PLAN.md)。
+完整兼容性测试矩阵见 [`docs/TEST_PLAN.md`](./docs/TEST_PLAN.md)。线上 MCP 实际检查项与限制见 [`docs/VERIFICATION.md`](./docs/VERIFICATION.md)。
 
 ## 开源边界
 

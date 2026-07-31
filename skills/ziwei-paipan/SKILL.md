@@ -51,7 +51,7 @@ If `<skill_dir>/runtime.conf` exists, follow its configured runtime and command.
 
 Read the key from `FATESTAR_API_KEY`, a local `.env`, or the explicit `--api_key` argument. Never print, quote back, log, or persist a real key. Recommend environment configuration if the user pasted a key into chat.
 
-The CLI sends `X-FateStar-Client: skill/2.2.0`. A key on `chart` or `transits` only attributes the free request; it does not make those operations paid.
+The CLI sends `X-FateStar-Client: skill/2.3.0`. A key on `chart` or `transits` only attributes the free request; it does not make those operations paid.
 
 - On `401`, stop and ask the user to verify or replace the key.
 - On `402`, do not retry the paid request. Report that credits are insufficient and offer the free chart workflow.

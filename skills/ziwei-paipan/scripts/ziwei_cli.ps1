@@ -34,7 +34,7 @@ Load-Env
 $DEFAULT_API_BASE = "https://www.fatestar.top"
 $CHART_PATH = "/api/ziwei"
 $READING_PATH = "/api/ziwei/reading"
-$CLIENT_ID = "skill/2.2.0"
+$CLIENT_ID = "skill/2.3.0"
 # END GENERATED:CONSTANTS
 
 function Get-ApiBase {

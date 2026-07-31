@@ -38,7 +38,7 @@ loadEnv();
 const DEFAULT_API_BASE = "https://www.fatestar.top";
 const CHART_PATH = "/api/ziwei";
 const READING_PATH = "/api/ziwei/reading";
-const CLIENT_ID = "skill/2.2.0";
+const CLIENT_ID = "skill/2.3.0";
 // END GENERATED:CONSTANTS
 
 function apiBase() {

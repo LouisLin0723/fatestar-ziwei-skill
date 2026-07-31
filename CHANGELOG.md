@@ -1,5 +1,12 @@
 # Changelog
 
+## 2.3.0 - 2026-08-01
+
+- Added native MCP `outputSchema`, behavior annotations, and `structuredContent` while preserving legacy JSON text.
+- Added an automated live contract check for the hosted MCP endpoint.
+- Added a focused, factual comparison with open-source alternatives.
+- Corrected the documented default transit target to the current lunar date plus birth hour.
+
 ## 2.2.0 - 2026-08-01
 
 - Consolidated Agent Skill, hosted MCP, and REST API access in one repository.

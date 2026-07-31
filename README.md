@@ -1,10 +1,11 @@
 # FateStar Ziwei
 
-Free hosted Zi Wei Dou Shu (Purple Star Astrology) charting for AI agents. Use it as an Agent Skill, a remote MCP server, or a REST API.
+A Zi Wei-focused hosted MCP for AI agents. One URL; no local server, package install, account, or API key for natal charts and six transit levels. Also available as an Agent Skill and REST API.
 
 [简体中文](./README.zh-CN.md)
 
 [![Validate](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/validate.yml/badge.svg)](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/validate.yml)
+[![Live contract](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/live-contract.yml/badge.svg)](https://github.com/LouisLin0723/fatestar-ziwei/actions/workflows/live-contract.yml)
 [![MCP Registry](https://img.shields.io/badge/MCP_Registry-listed-8b5cf6)](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.LouisLin0723%2Ffatestar-ziwei)
 [![Release](https://img.shields.io/github/v/release/LouisLin0723/fatestar-ziwei)](https://github.com/LouisLin0723/fatestar-ziwei/releases)
 [![Stars](https://img.shields.io/github/stars/LouisLin0723/fatestar-ziwei?style=flat)](https://github.com/LouisLin0723/fatestar-ziwei/stargazers)
@@ -33,10 +34,22 @@ The agent calls FateStar and returns:
 
 - a natal chart with 12 palaces, stars, brightness, and Four Transformations;
 - true-solar-time correction when longitude and timezone are supplied;
-- decade, annual, monthly, daily, and hourly transits;
+- decade, minor-cycle, annual, monthly, daily, and hourly transits;
 - an optional Zheng Da Qian reading when a valid key and credits are available.
 
 If the live result is useful, [star the repository](https://github.com/LouisLin0723/fatestar-ziwei). It helps other agent developers find the free endpoint.
+
+## Why FateStar
+
+FateStar is deliberately narrow: it makes Zi Wei chart data easy to use from an AI agent without operating a local astrology server.
+
+| Choose | When it fits |
+| --- | --- |
+| **FateStar** | You want a hosted remote MCP now: one URL, anonymous free charting, six transit levels, native structured MCP output, and an official Registry listing. |
+| [Iztro](https://github.com/SylarLong/iztro) | You need an open-source Zi Wei engine to embed, inspect, or modify inside your own application. |
+| [Taibu](https://github.com/hhszzzz/taibu) or [Horosa Skill](https://github.com/Horace-Maxwell/horosa-skill) | You prefer broader multi-system or offline metaphysics tooling over a focused hosted Zi Wei endpoint. |
+
+These are different deployment choices, not a claim that one school or engine is universally more accurate.
 
 ## Quick start
 
@@ -74,6 +87,8 @@ No local server is required. Add the remote endpoint to a client that supports S
 ```
 
 The endpoint exposes `ziwei_chart`, `ziwei_transits`, and `ziwei_reading`. The first two tools are free and anonymous.
+
+`tools/list` declares an `outputSchema` and behavior annotations for every tool. Successful calls return both native `structuredContent` and legacy JSON text, so newer agents can consume typed fields while older clients keep working.
 
 The server is listed in the official MCP Registry as [`io.github.LouisLin0723/fatestar-ziwei`](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.LouisLin0723%2Ffatestar-ziwei).
 
@@ -162,6 +177,7 @@ The root [`server.json`](./server.json) describes the hosted endpoint using the 
 
 ```bash
 python skills/ziwei-paipan/scripts/generate.py --check
+python tests/live_contract_check.py
 python skills/ziwei-paipan/scripts/ziwei_cli.py doc
 node skills/ziwei-paipan/scripts/ziwei_cli.js doc
 powershell -ExecutionPolicy Bypass -File skills/ziwei-paipan/scripts/ziwei_cli.ps1 doc
@@ -169,7 +185,7 @@ bash skills/ziwei-paipan/scripts/ziwei_cli.sh doc
 ```
 
 The four clients share generated constants and an offline interface spec. Edit the shared files first, run `generate.py`, then run the checks above.
-The broader compatibility matrix is in [`docs/TEST_PLAN.md`](./docs/TEST_PLAN.md).
+The broader compatibility matrix is in [`docs/TEST_PLAN.md`](./docs/TEST_PLAN.md). The exact hosted MCP assertions and their limits are documented in [`docs/VERIFICATION.md`](./docs/VERIFICATION.md).
 
 ## Open-source boundary
 
